@@ -52,7 +52,7 @@ export function Hero() {
         >
           <span className="block overflow-hidden">
             <motion.span className="block" variants={textRevealVariants} initial="hidden" animate="visible" custom={0}>
-              Ship faster.
+              Stop guessing.
             </motion.span>
           </span>
           <span className="block overflow-hidden">
@@ -63,7 +63,7 @@ export function Hero() {
               animate="visible"
               custom={1}
             >
-              Scale smarter.
+              Start Validating.
             </motion.span>
           </span>
         </h1>

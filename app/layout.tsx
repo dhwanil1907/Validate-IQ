@@ -23,8 +23,8 @@ const instrumentSans = localFont({
 })
 
 export const metadata: Metadata = {
-  title: "Apex - Enterprise SaaS Platform",
-  description: "The modern platform for teams who ship fast. Built for scale, designed for speed.",
+  title: "ValidateIQ - Stop Guessing, Start Validating",
+  description: "Stop guessing. Start Validating. The modern platform for teams who validate ideas and make data-driven decisions.",
     generator: 'v0.app'
 }
 
