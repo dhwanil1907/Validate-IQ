@@ -1,7 +1,6 @@
 import type React from "react"
 import type { Metadata } from "next"
-import { Manrope } from "next/font/google"
-import localFont from "next/font/local"
+import { Manrope, Inter, DM_Sans } from "next/font/google"
 import { Analytics } from "@vercel/analytics/next"
 import "./globals.css"
 
@@ -10,15 +9,15 @@ const manrope = Manrope({
   variable: "--font-manrope",
 })
 
-const calSans = localFont({
-  src: "./fonts/CalSans-SemiBold.woff2",
-  variable: "--font-cal-sans",
+const inter = Inter({
+  subsets: ["latin"],
+  variable: "--font-inter",
   display: "swap",
 })
 
-const instrumentSans = localFont({
-  src: "./fonts/InstrumentSans-Variable.woff2",
-  variable: "--font-instrument-sans",
+const dmSans = DM_Sans({
+  subsets: ["latin"],
+  variable: "--font-dm-sans",
   display: "swap",
 })
 
@@ -35,7 +34,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className="dark">
-      <body className={`${manrope.variable} ${calSans.variable} ${instrumentSans.variable} font-sans antialiased`}>
+      <body className={`${manrope.variable} ${inter.variable} ${dmSans.variable} font-sans antialiased`}>
         <div className="noise-overlay" aria-hidden="true" />
         {children}
         <Analytics />
