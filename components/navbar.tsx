@@ -57,7 +57,7 @@ function FundingTicker() {
           .ticker-track {
             display: flex;
             width: max-content;
-            animation: ticker 30s linear infinite;
+            animation: ticker 60s linear infinite;
           }
           .ticker-track:hover { animation-play-state: paused; }
         `}</style>
