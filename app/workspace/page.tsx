@@ -5,14 +5,9 @@ import { useRouter } from "next/navigation"
 import { toast } from "sonner"
 import { LogoMark } from "@/components/logo-mark"
 import {
-  BarChart2,
   FileText,
-  Paperclip,
   Settings,
-  Sliders,
-  Scale,
   Star,
-  TrendingUp,
   Zap,
   ArrowUp,
   Plus,
@@ -96,26 +91,6 @@ const LOADING_STEPS = [
   "Assessing viability...",
   "Checking failure history...",
   "Building your report...",
-]
-
-const QUICK_TABS = ["Validate Idea", "Pivot an Idea", "Compare Ideas"] as const
-
-const FEATURE_CARDS = [
-  {
-    icon: BarChart2,
-    title: "Market Sizing Engine",
-    desc: "TAM, SAM, SOM in plain English — not consultant-speak.",
-  },
-  {
-    icon: TrendingUp,
-    title: "Competitor Radar",
-    desc: "Surface who's in your space, what they charge, and where they're weak.",
-  },
-  {
-    icon: Scale,
-    title: "Go / No-Go Verdict",
-    desc: "A direct call with a one-paragraph rationale — paste it straight into your pitch deck.",
-  },
 ]
 
 // ─── Verdict Badge ────────────────────────────────────────────────────────────
@@ -486,7 +461,6 @@ function EmptyState({
   onIdeaChange: (v: string) => void
   onSubmit: () => void
 }) {
-  const [activeTab, setActiveTab] = useState<(typeof QUICK_TABS)[number]>("Validate Idea")
   const textareaRef = useRef<HTMLTextAreaElement>(null)
   const remaining = MAX_CHARS - idea.length
 
@@ -513,26 +487,6 @@ function EmptyState({
         </p>
       </div>
 
-      {/* Tab pills */}
-      <div
-        className="flex items-center gap-1 p-1 rounded-lg mb-6 border"
-        style={{ background: "#0A1A10", borderColor: "#122B1A" }}
-      >
-        {QUICK_TABS.map((tab) => (
-          <button
-            key={tab}
-            onClick={() => setActiveTab(tab)}
-            className="px-4 py-1.5 rounded-md text-sm font-medium transition-all"
-            style={{
-              background: activeTab === tab ? "#059669" : "transparent",
-              color: activeTab === tab ? "#ffffff" : "#6B7280",
-            }}
-          >
-            {tab}
-          </button>
-        ))}
-      </div>
-
       {/* Input box */}
       <div
         className="w-full rounded-xl border overflow-hidden mb-4"
@@ -549,30 +503,7 @@ function EmptyState({
         />
 
         {/* Toolbar */}
-        <div className="flex items-center justify-between px-4 py-3 border-t" style={{ borderColor: "#122B1A" }}>
-          <div className="flex items-center gap-1">
-            {[
-              { icon: Paperclip, label: "Attach" },
-              { icon: Settings, label: "Settings" },
-              { icon: Sliders, label: "Options" },
-            ].map(({ icon: Icon, label }) => (
-              <button
-                key={label}
-                className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-md text-xs transition-colors"
-                style={{ color: "#6B7280" }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.background = "rgba(255,255,255,0.05)"
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.background = "transparent"
-                }}
-              >
-                <Icon size={13} />
-                {label}
-              </button>
-            ))}
-          </div>
-
+        <div className="flex items-center justify-end px-4 py-3 border-t" style={{ borderColor: "#122B1A" }}>
           <div className="flex items-center gap-3">
             <span
               className="text-xs tabular-nums"
@@ -615,35 +546,6 @@ function EmptyState({
         to continue to survey
       </p>
 
-      {/* Feature cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 w-full">
-        {FEATURE_CARDS.map(({ icon: Icon, title, desc }) => (
-          <div
-            key={title}
-            className="rounded-xl border p-4 cursor-pointer transition-all"
-            style={{ background: "#0A1A10", borderColor: "#122B1A" }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.borderColor = "rgba(5,150,105,0.35)"
-              e.currentTarget.style.background = "rgba(255,255,255,0.04)"
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.borderColor = "#122B1A"
-              e.currentTarget.style.background = "#0A1A10"
-            }}
-          >
-            <div
-              className="w-8 h-8 rounded-lg flex items-center justify-center mb-3"
-              style={{ background: "rgba(5,150,105,0.12)" }}
-            >
-              <Icon size={15} style={{ color: "#059669" }} />
-            </div>
-            <p className="text-sm font-medium text-white mb-1">{title}</p>
-            <p className="text-xs leading-relaxed" style={{ color: "#6B7280" }}>
-              {desc}
-            </p>
-          </div>
-        ))}
-      </div>
     </div>
   )
 }

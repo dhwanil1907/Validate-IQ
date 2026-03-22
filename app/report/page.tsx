@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react"
 import { useRouter } from "next/navigation"
-import { Settings, ArrowUp } from "lucide-react"
+import { ArrowUp } from "lucide-react"
 import { toast } from "sonner"
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -272,12 +272,6 @@ function IdeaProfileTab({
           </div>
         ))}
       </div>
-      <button
-        className="w-full mt-3 py-1.5 rounded-md text-[10px] font-medium border transition-colors hover:bg-[#0A2E1A]"
-        style={{ background: "#0A1A10", borderColor: "#059669", color: "#34D399" }}
-      >
-        Re-run affected sections
-      </button>
     </div>
   )
 }
@@ -1113,12 +1107,6 @@ export default function ReportPage() {
               style={{ background: "#059669" }}
             >
               {pdfLoading ? "Generating…" : "Download PDF"}
-            </button>
-            <button
-              className="flex items-center justify-center rounded-md border"
-              style={{ width: 26, height: 26, borderColor: "#122B1A" }}
-            >
-              <Settings size={12} style={{ color: "#6B7280" }} />
             </button>
           </div>
         </div>

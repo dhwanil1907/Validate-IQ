@@ -10,8 +10,6 @@ import { LogoMark } from "@/components/logo-mark"
 const navItems = [
   { label: "Features", href: "#features" },
   { label: "Pricing", href: "#pricing" },
-  { label: "Docs", href: "#docs" },
-  { label: "Blog", href: "#blog" },
 ]
 
 export function Navbar() {
