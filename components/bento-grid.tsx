@@ -130,8 +130,8 @@ function GapScoreMock() {
           />
         </svg>
         <div className="absolute inset-0 flex flex-col items-center justify-center">
-          <span className="text-2xl font-semibold tabular-nums text-white">7.2</span>
-          <span className="text-[10px] uppercase tracking-wider text-[#52525b]">/ 10</span>
+          <span className="text-2xl font-semibold tabular-nums text-white">72</span>
+          <span className="text-[10px] uppercase tracking-wider text-[#52525b]">/ 100</span>
         </div>
       </div>
     </div>
@@ -214,7 +214,7 @@ export function BentoGrid() {
     <section
       ref={ref}
       id="features"
-      className="bg-[#000000] px-4 py-24 [font-family:var(--font-inter),system-ui,sans-serif]"
+      className="bg-[#000000] px-4 pt-8 pb-24 [font-family:var(--font-inter),system-ui,sans-serif]"
     >
       <div className="mx-auto max-w-6xl">
         <motion.div

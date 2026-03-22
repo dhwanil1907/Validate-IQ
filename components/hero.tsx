@@ -19,12 +19,21 @@ export function Hero() {
 
   return (
     <section
-      className="relative min-h-screen flex flex-col justify-center px-4 sm:px-6 lg:px-8 pt-28 pb-20 overflow-hidden bg-[#000000] [font-family:var(--font-inter),system-ui,sans-serif]"
+      className="relative min-h-screen flex flex-col justify-center px-4 sm:px-6 lg:px-8 pt-28 pb-8 overflow-hidden bg-[#000000] [font-family:var(--font-inter),system-ui,sans-serif]"
     >
       <div className="absolute inset-0 bg-[#000000] pointer-events-none" aria-hidden />
 
       <div className="relative z-10 mx-auto w-full max-w-3xl">
         <div className="flex flex-col items-center text-center">
+          <motion.p
+            initial={{ opacity: 0, y: 14 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.4, delay: 0.03, ease: easeOut }}
+            className="mb-4 text-4xl font-bold tracking-wide text-[#10B981]"
+          >
+            VERDICT
+          </motion.p>
+
           <motion.h1
             initial={{ opacity: 0, y: 14 }}
             animate={{ opacity: 1, y: 0 }}
@@ -58,7 +67,7 @@ export function Hero() {
             initial={{ opacity: 0, y: 14 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.4, delay: 0.15, ease: easeOut }}
-            className="mt-8 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-center"
+            className="mt-4 flex justify-center"
           >
             <Button
               size="lg"
@@ -70,16 +79,7 @@ export function Hero() {
               className="h-auto rounded-lg border-0 bg-[#10B981] px-8 py-4 font-semibold text-white shadow-none transition-[box-shadow,background-color] duration-300 ease-out hover:bg-[#059669] hover:shadow-[0_0_24px_-4px_rgba(16,185,129,0.4)]"
               style={{ fontSize: "16px" }}
             >
-              → Validate My Idea
-            </Button>
-            <Button
-              variant="ghost"
-              size="lg"
-              onClick={handleTryDemo}
-              className="h-auto rounded-lg border border-[#2A2D35] px-5 py-3 font-medium text-[#6B7280] transition-[color,border-color] duration-[280ms] ease-out hover:border-[#10B981] hover:bg-transparent hover:text-white"
-              style={{ fontSize: "14px" }}
-            >
-              Try Demo →
+              Validate My Idea →
             </Button>
           </motion.div>
         </div>

@@ -152,7 +152,12 @@ export async function POST(req: NextRequest) {
     const geo = survey?.geography ?? "Global"
 
     const systemPrompt = (extra = "") =>
-      `You are a startup analyst with live web access. ${founderCtx}${extra}\nReturn JSON only. No markdown. No preamble. No explanation. Just the raw JSON object.`
+      `You are a senior startup analyst with live web access. ${founderCtx}${extra}
+IMPORTANT RULES:
+- If the idea is niche or hyper-specific, look at the broader parent market it belongs to and reason from there. Do NOT give up or return low scores just because direct data is scarce.
+- Always provide substantive, specific insight — never generic filler like "market data unavailable".
+- Scores should reflect real opportunity, not how much data exists about the niche.
+Return JSON only. No markdown. No preamble. No explanation. Just the raw JSON object.`
 
     // ── 6 parallel Perplexity calls ───────────────────────────────────────────
 
@@ -165,7 +170,8 @@ export async function POST(req: NextRequest) {
             { role: "system", content: systemPrompt() },
             {
               role: "user",
-              content: `For this startup idea: ${idea}
+              content: `For this startup idea: "${idea}"
+Analyze it carefully. If the idea is niche, identify the specific problem it solves and the precise customer segment it targets — do not generalize. clarityScore (0-10) should reflect how clearly the idea is defined, not how big the market is.
 Return this exact JSON:
 {
   "oneLiner": string,
@@ -183,8 +189,9 @@ Return this exact JSON:
             { role: "system", content: systemPrompt() },
             {
               role: "user",
-              content: `For this startup idea: ${idea}
+              content: `For this startup idea: "${idea}"
 Geography: ${geo}
+If this is a niche idea, identify the broader parent market (e.g. "B2B SaaS", "creator economy tools", "healthcare AI") and size the TAM from that, then narrow to SAM and SOM for this specific niche. Always provide real dollar figures with sources — never say "data unavailable". marketTiming reflects how early or late the underlying trend is.
 Return this exact JSON:
 {
   "tam": string,
@@ -205,8 +212,8 @@ Return this exact JSON:
             { role: "system", content: systemPrompt() },
             {
               role: "user",
-              content: `For this startup idea: ${idea}
-Find 3-5 real active competitors.
+              content: `For this startup idea: "${idea}"
+Find 3-5 real companies competing in this space. If there are no direct competitors, find adjacent competitors solving a related problem or serving the same customer. Include at least 3 entries — use adjacent market players if needed, and note that in their "name" field. gapStatement should explain what gap this idea fills that existing solutions miss.
 Return this exact JSON:
 {
   "competitors": [
@@ -228,11 +235,12 @@ Return this exact JSON:
         { role: "system", content: systemPrompt() },
         {
           role: "user",
-          content: `For this startup idea: ${idea}
+          content: `For this startup idea: "${idea}"
 ${founderCtx}
+Rate how easy it is for a new founder to enter this market (entryScore 0-10, where 10 = very easy to get started). Consider: regulatory complexity, capital requirements, incumbent moats, technical difficulty. A niche idea with low competition should score higher, not lower. Be specific about the 3 real barriers and 2 genuine advantages this founder has given their profile.
 Return this exact JSON:
 {
-  "entryScore": number (0-10, where 10 = easiest to enter),
+  "entryScore": number,
   "barriers": [string, string, string],
   "advantages": [string, string],
   "fastestEntryPath": string
@@ -245,11 +253,12 @@ Return this exact JSON:
         { role: "system", content: systemPrompt() },
         {
           role: "user",
-          content: `For this startup idea: ${idea}
+          content: `For this startup idea: "${idea}"
 ${founderCtx}
+Give an honest viability assessment. viabilityScore is 0-9 (9 = highly viable). A niche idea can be highly viable — score based on: real demand, founder-market fit, defensibility, and monetization potential. Do NOT penalize for being niche. topReasons and topRisks must be specific to THIS idea, not generic startup risks. nextAction should be the single most important thing this founder should do in the next 7 days.
 Return this exact JSON:
 {
-  "viabilityScore": number (0-9, where 9 = most viable),
+  "viabilityScore": number,
   "topReasons": [string, string, string],
   "topRisks": [string, string, string],
   "nextAction": string
@@ -264,8 +273,8 @@ Return this exact JSON:
             { role: "system", content: systemPrompt() },
             {
               role: "user",
-              content: `For this startup idea: ${idea}
-Find 3 real companies that tried this and failed.
+              content: `For this startup idea: "${idea}"
+Find 3 real companies that tried something similar and failed. If there are no direct matches, find companies that failed in the broader problem space or adjacent niche. Always return 3 entries — use the closest analogues available. thePattern should identify the recurring failure mode. survivalRule should be the specific thing that would make THIS idea avoid that fate.
 Return this exact JSON:
 {
   "failures": [

@@ -13,6 +13,7 @@ import {
   Plus,
   BookOpen,
   ArrowLeft,
+  Trash2,
 } from "lucide-react"
 import demoData from "@/lib/demo-data.json"
 
@@ -37,6 +38,7 @@ interface SavedReport {
   viabilityScore: number
   report: object
   survey: object
+  starred?: boolean
 }
 
 const DEFAULT_SURVEY: SurveyAnswers = {
@@ -123,23 +125,81 @@ function VerdictBadge({ verdict }: { verdict: string }) {
   )
 }
 
+// ─── Report Row ──────────────────────────────────────────────────────────────
+
+function ReportRow({ r, onLoadReport, onStarReport, onDeleteReport, formatDate }: {
+  r: SavedReport
+  onLoadReport: (r: SavedReport) => void
+  onStarReport: (id: string) => void
+  onDeleteReport: (id: string) => void
+  formatDate: (iso: string) => string
+}) {
+  return (
+    <div
+      className="group flex items-start gap-2 px-3 py-2.5 rounded-lg transition-colors w-full"
+      style={{ color: "#6B7280" }}
+      onMouseEnter={(e) => {
+        e.currentTarget.style.background = "rgba(255,255,255,0.05)"
+        e.currentTarget.style.color = "#ffffff"
+      }}
+      onMouseLeave={(e) => {
+        e.currentTarget.style.background = "transparent"
+        e.currentTarget.style.color = "#6B7280"
+      }}
+    >
+      <button onClick={() => onLoadReport(r)} className="flex items-start gap-2 text-left flex-1 min-w-0">
+        <BookOpen size={13} className="shrink-0 mt-0.5" />
+        <div className="min-w-0 flex-1">
+          <div className="flex items-center gap-1 mb-0.5 flex-wrap">
+            <span className="text-sm text-white truncate">
+              {r.idea.slice(0, 30)}{r.idea.length > 30 ? "…" : ""}
+            </span>
+            <VerdictBadge verdict={r.verdict} />
+          </div>
+          <span className="text-xs" style={{ color: "#6B7280" }}>{formatDate(r.date)}</span>
+        </div>
+      </button>
+      <div className="flex items-center gap-0.5 shrink-0 mt-0.5 opacity-0 group-hover:opacity-100 transition-opacity">
+        <button
+          onClick={(e) => { e.stopPropagation(); onStarReport(r.id) }}
+          className="p-1 rounded transition-colors hover:text-yellow-400"
+          style={{ color: r.starred ? "#FBBF24" : "inherit" }}
+          title={r.starred ? "Unstar" : "Save to Saved Ideas"}
+        >
+          <Star size={12} fill={r.starred ? "#FBBF24" : "none"} />
+        </button>
+        <button
+          onClick={(e) => { e.stopPropagation(); onDeleteReport(r.id) }}
+          className="p-1 rounded transition-colors hover:text-red-400"
+          title="Delete"
+        >
+          <Trash2 size={12} />
+        </button>
+      </div>
+    </div>
+  )
+}
+
 // ─── Sidebar ─────────────────────────────────────────────────────────────────
 
 function Sidebar({
   onNewValidation,
   savedReports,
   onLoadReport,
+  onDeleteReport,
+  onStarReport,
   reportsRef,
 }: {
   onNewValidation: () => void
   savedReports: SavedReport[]
   onLoadReport: (r: SavedReport) => void
+  onDeleteReport: (id: string) => void
+  onStarReport: (id: string) => void
   reportsRef: React.RefObject<HTMLDivElement | null>
 }) {
 
-  function scrollToReports() {
-    reportsRef.current?.scrollIntoView({ behavior: "smooth", block: "start" })
-  }
+  const scrollContainerRef = useRef<HTMLDivElement>(null)
+  const [filterStarred, setFilterStarred] = useState(false)
 
   function formatDate(iso: string) {
     try {
@@ -150,9 +210,8 @@ function Sidebar({
   }
 
   const NAV_ITEMS = [
-    { icon: Zap, label: "Validate Idea", active: true, onClick: undefined as (() => void) | undefined },
-    { icon: FileText, label: "My Reports", active: false, onClick: scrollToReports },
-    { icon: Star, label: "Saved Ideas", active: false, onClick: scrollToReports },
+    { icon: Zap, label: "Validate Idea", active: !filterStarred, onClick: () => setFilterStarred(false) },
+    { icon: Star, label: "Saved Ideas", active: filterStarred, onClick: () => setFilterStarred(v => !v) },
   ]
 
   return (
@@ -170,8 +229,10 @@ function Sidebar({
       <div className="px-4 py-4">
         <button
           onClick={onNewValidation}
-          className="w-full flex items-center justify-center gap-2 py-2.5 rounded-lg font-medium text-white text-sm transition-all hover:brightness-110 active:scale-[0.98]"
-          style={{ background: "#10B981" }}
+          className="w-full flex items-center justify-center gap-2 py-2.5 rounded-lg font-medium text-sm transition-all active:scale-[0.98]"
+          style={{ background: "transparent", border: "1px solid #2A2D35", color: "#9CA3AF" }}
+          onMouseEnter={(e) => { e.currentTarget.style.borderColor = "#10B981"; e.currentTarget.style.color = "#34D399" }}
+          onMouseLeave={(e) => { e.currentTarget.style.borderColor = "#2A2D35"; e.currentTarget.style.color = "#9CA3AF" }}
         >
           <Plus size={15} />
           New Validation
@@ -179,8 +240,8 @@ function Sidebar({
       </div>
 
       {/* Nav + Saved Reports */}
-      <div className="px-3 flex-1 overflow-y-auto">
-        <p className="px-2 mb-2 text-[11px] font-semibold uppercase tracking-widest" style={{ color: "#6B7280" }}>
+      <div ref={scrollContainerRef} className="px-3 flex-1 overflow-y-auto">
+        <p className="px-2 mb-2 text-xs font-semibold uppercase tracking-widest" style={{ color: "#6B7280" }}>
           Features
         </p>
         <nav className="flex flex-col gap-0.5 mb-6">
@@ -188,14 +249,16 @@ function Sidebar({
             <button
               key={label}
               onClick={onClick}
-              className="flex items-center gap-2.5 px-3 py-2.5 rounded-lg text-sm text-left transition-colors w-full"
+              className="flex items-center gap-2.5 px-3 py-2.5 text-base text-left transition-colors w-full"
               style={{
-                background: active ? "rgba(16,185,129,0.12)" : "transparent",
+                background: active ? "rgba(16,185,129,0.06)" : "transparent",
                 color: active ? "#34D399" : "#6B7280",
+                borderLeft: active ? "2px solid #10B981" : "2px solid transparent",
+                borderRadius: active ? "0 6px 6px 0" : "6px",
               }}
               onMouseEnter={(e) => {
                 if (!active) {
-                  e.currentTarget.style.background = "rgba(255,255,255,0.05)"
+                  e.currentTarget.style.background = "rgba(255,255,255,0.04)"
                   e.currentTarget.style.color = "#ffffff"
                 }
               }}
@@ -213,45 +276,23 @@ function Sidebar({
         </nav>
 
         <div ref={reportsRef}>
-          <p className="px-2 mb-2 text-[11px] font-semibold uppercase tracking-widest" style={{ color: "#6B7280" }}>
-            Recent Validations
+          <p className="px-2 mb-2 text-xs font-semibold uppercase tracking-widest" style={{ color: "#6B7280" }}>
+            {filterStarred ? "Saved Ideas" : "Recent Validations"}
           </p>
           <div className="flex flex-col gap-0.5">
-            {savedReports.length === 0 ? (
-              <p className="px-3 py-2 text-xs" style={{ color: "#6B7280" }}>
-                No validations yet. Run your first one above.
-              </p>
-            ) : (
-              savedReports
-                .filter((r, i, arr) => arr.findIndex(x => x.idea === r.idea) === i)
-                .slice(0, 5).map((r) => (
-                <button
-                  key={r.id}
-                  onClick={() => onLoadReport(r)}
-                  className="flex items-start gap-2 px-3 py-2.5 rounded-lg text-left transition-colors w-full"
-                  style={{ color: "#6B7280" }}
-                  onMouseEnter={(e) => {
-                    e.currentTarget.style.background = "rgba(255,255,255,0.05)"
-                    e.currentTarget.style.color = "#ffffff"
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.background = "transparent"
-                    e.currentTarget.style.color = "#6B7280"
-                  }}
-                >
-                  <BookOpen size={13} className="shrink-0 mt-0.5" />
-                  <div className="min-w-0 flex-1">
-                    <div className="flex items-center gap-1 mb-0.5 flex-wrap">
-                      <span className="text-xs text-white truncate">
-                        {r.idea.slice(0, 30)}{r.idea.length > 30 ? "…" : ""}
-                      </span>
-                      <VerdictBadge verdict={r.verdict} />
-                    </div>
-                    <span className="text-[10px]" style={{ color: "#6B7280" }}>{formatDate(r.date)}</span>
-                  </div>
-                </button>
+            {(() => {
+              const list = filterStarred
+                ? savedReports.filter(r => r.starred)
+                : savedReports.slice(0, 5)
+              if (list.length === 0) return (
+                <p className="px-3 py-2 text-sm" style={{ color: "#6B7280" }}>
+                  {filterStarred ? "Star a validation to save it here." : "No validations yet. Run your first one above."}
+                </p>
+              )
+              return list.map((r) => (
+                <ReportRow key={r.id} r={r} onLoadReport={onLoadReport} onStarReport={onStarReport} onDeleteReport={onDeleteReport} formatDate={formatDate} />
               ))
-            )}
+            })()}
           </div>
         </div>
       </div>
@@ -267,7 +308,7 @@ function Sidebar({
           </div>
           <div className="min-w-0">
             <p className="text-sm font-medium text-white truncate">Founder</p>
-            <p className="text-xs truncate" style={{ color: "#6B7280" }}>Free plan</p>
+            <p className="text-sm truncate" style={{ color: "#6B7280" }}>Free plan</p>
           </div>
         </div>
       </div>
@@ -277,84 +318,14 @@ function Sidebar({
 
 // ─── Top Bar ─────────────────────────────────────────────────────────────────
 
-function TopBar({ isDemoMode, geography }: { isDemoMode: boolean; geography: string }) {
-  const router = useRouter()
-  const [showConfig, setShowConfig] = useState(false)
-  const configRef = useRef<HTMLDivElement>(null)
-
-  useEffect(() => {
-    function handleOutside(e: MouseEvent) {
-      if (configRef.current && !configRef.current.contains(e.target as Node)) {
-        setShowConfig(false)
-      }
-    }
-    if (showConfig) document.addEventListener("mousedown", handleOutside)
-    return () => document.removeEventListener("mousedown", handleOutside)
-  }, [showConfig])
-
-  function handleExport() {
-    const hasReport = !!localStorage.getItem("validateiq_report")
-    if (hasReport) {
-      router.push("/report")
-    } else {
-      toast.error("Run a validation first to view your report.")
-    }
-  }
-
+function TopBar() {
   return (
     <div
-      className="h-14 flex items-center justify-between px-6 border-b shrink-0"
+      className="relative h-14 flex items-center justify-between px-6 border-b shrink-0"
       style={{ borderColor: "#2A2D35" }}
     >
-      <div className="flex min-w-0 items-center gap-2">
-        <span className="text-xs text-[#6B7280]">Verdict</span>
-        <span className="text-xs text-[#6B7280]" aria-hidden>/</span>
-        <span className="text-sm font-medium text-white">Workspace</span>
-      </div>
-      <div className="flex items-center gap-2">
-        <div ref={configRef} className="relative">
-          <button
-            onClick={() => setShowConfig((v) => !v)}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border text-xs font-medium transition-colors"
-            style={{
-              borderColor: showConfig ? "#10B981" : "#2A2D35",
-              color: showConfig ? "#34D399" : "#6B7280",
-              background: "transparent",
-            }}
-          >
-            <Settings size={13} />
-            Configuration
-          </button>
-          {showConfig && (
-            <div
-              className="absolute right-0 top-full mt-1 rounded-lg border z-30 py-3 px-3 flex flex-col gap-2.5"
-              style={{ background: "#1C1F26", borderColor: "#2A2D35", width: 220 }}
-            >
-              <p className="text-[9px] uppercase tracking-widest font-semibold" style={{ color: "#6B7280" }}>
-                Configuration
-              </p>
-              {[
-                { label: "Model", value: "Perplexity Sonar Pro" },
-                { label: "Geography", value: geography || "United States" },
-                { label: "Mode", value: isDemoMode ? "Demo" : "Live" },
-              ].map(({ label, value }) => (
-                <div key={label} className="flex items-center justify-between">
-                  <span className="text-xs" style={{ color: "#6B7280" }}>{label}</span>
-                  <span className="text-xs font-medium text-white">{value}</span>
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
-        <button
-          onClick={handleExport}
-          className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border text-xs font-medium transition-colors hover:border-[rgba(255,255,255,0.12)]"
-          style={{ borderColor: "#2A2D35", color: "#6B7280", background: "transparent" }}
-        >
-          <FileText size={13} />
-          View Report
-        </button>
-      </div>
+      <span className="text-base font-medium text-white">Workspace</span>
+      <span className="absolute left-1/2 -translate-x-1/2 text-xl font-bold tracking-wide text-[#10B981]">VERDICT</span>
     </div>
   )
 }
@@ -452,9 +423,11 @@ function EmptyState({
 }) {
   const textareaRef = useRef<HTMLTextAreaElement>(null)
   const remaining = MAX_CHARS - idea.length
+  const [isMac, setIsMac] = useState(false)
 
   useEffect(() => {
     textareaRef.current?.focus()
+    setIsMac(/Mac|iPhone|iPad|iPod/.test(navigator.userAgent))
   }, [])
 
   function handleKeyDown(e: React.KeyboardEvent<HTMLTextAreaElement>) {
@@ -471,7 +444,7 @@ function EmptyState({
         <h1 className="text-3xl font-semibold text-white mb-3 tracking-tight">
           What&apos;s your next idea?
         </h1>
-        <p className="text-sm" style={{ color: "#6B7280" }}>
+        <p className="text-base" style={{ color: "#6B7280" }}>
           Type it below. Get competitors, market size, gaps, and a go/no-go verdict in 60 seconds.
         </p>
       </div>
@@ -487,15 +460,15 @@ function EmptyState({
           onChange={(e) => onIdeaChange(e.target.value.slice(0, MAX_CHARS))}
           onKeyDown={handleKeyDown}
           placeholder='Describe your startup idea in one sentence…'
-          rows={5}
-          className="w-full resize-none bg-transparent px-5 pt-4 pb-2 text-sm text-white placeholder:text-[#6B7280] outline-none leading-relaxed"
+          rows={3}
+          className="w-full resize-none bg-transparent px-5 pt-4 pb-2 text-base text-white placeholder:text-[#6B7280] outline-none leading-relaxed"
         />
 
         {/* Toolbar */}
         <div className="flex items-center justify-end px-4 py-3 border-t" style={{ borderColor: "#2A2D35" }}>
           <div className="flex items-center gap-3">
             <span
-              className="text-xs tabular-nums"
+              className="text-sm tabular-nums"
               style={{ color: remaining < 20 ? "#EF4444" : "#6B7280" }}
             >
               {idea.length}/{MAX_CHARS}
@@ -517,7 +490,7 @@ function EmptyState({
         </div>
       </div>
 
-      <p className="text-xs mb-10" style={{ color: "#6B7280" }}>
+      <p className="text-sm mb-10" style={{ color: "#6B7280" }}>
         Press{" "}
         <kbd
           className="px-1.5 py-0.5 rounded text-xs border"
@@ -527,9 +500,7 @@ function EmptyState({
             color: "#6B7280",
           }}
         >
-          {typeof navigator !== "undefined" && /Mac|iPhone|iPad|iPod/.test(navigator.userAgent)
-            ? "⌘"
-            : "Ctrl"}{" "}
+          {isMac ? "⌘" : "Ctrl"}{" "}
           Enter
         </kbd>{" "}
         to continue to survey
@@ -646,10 +617,20 @@ export default function WorkspacePage() {
     if (demo && demoIdea) {
       setIdea(demoIdea)
     }
-    // Load saved reports
+    // Load saved reports — deduplicate any legacy duplicates by idea text
     try {
       const saved = JSON.parse(localStorage.getItem("validateiq_saved_reports") || "[]")
-      setSavedReports(saved)
+      const seen = new Set<string>()
+      const deduped = (saved as { idea: string }[]).filter((r) => {
+        const key = r.idea.trim().toLowerCase()
+        if (seen.has(key)) return false
+        seen.add(key)
+        return true
+      })
+      if (deduped.length !== saved.length) {
+        localStorage.setItem("validateiq_saved_reports", JSON.stringify(deduped))
+      }
+      setSavedReports(deduped)
     } catch {
       setSavedReports([])
     }
@@ -751,6 +732,18 @@ export default function WorkspacePage() {
     router.push("/report")
   }
 
+  function handleDeleteReport(id: string) {
+    const updated = savedReports.filter((r) => r.id !== id)
+    setSavedReports(updated)
+    localStorage.setItem("validateiq_saved_reports", JSON.stringify(updated))
+  }
+
+  function handleStarReport(id: string) {
+    const updated = savedReports.map((r) => r.id === id ? { ...r, starred: !r.starred } : r)
+    setSavedReports(updated)
+    localStorage.setItem("validateiq_saved_reports", JSON.stringify(updated))
+  }
+
   return (
     <div
       className="flex min-h-screen [font-family:var(--font-inter),system-ui,sans-serif]"
@@ -760,6 +753,8 @@ export default function WorkspacePage() {
         onNewValidation={handleNewValidation}
         savedReports={savedReports}
         onLoadReport={handleLoadReport}
+        onDeleteReport={handleDeleteReport}
+        onStarReport={handleStarReport}
         reportsRef={reportsRef}
       />
 
@@ -767,16 +762,18 @@ export default function WorkspacePage() {
       <div className="flex flex-col flex-1 ml-[280px] min-h-screen">
         {/* Demo banner */}
         {isDemoMode && (
-          <div
-            className="flex items-center justify-center gap-2 px-4 py-2 text-xs font-medium text-white"
-            style={{ background: "#10B981" }}
-          >
-            <Zap size={12} />
-            You&apos;re in demo mode — results are pre-loaded for speed
+          <div className="flex items-center justify-center py-2">
+            <span
+              className="flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium"
+              style={{ background: "rgba(16,185,129,0.1)", color: "#34D399", border: "1px solid rgba(16,185,129,0.2)" }}
+            >
+              <Zap size={10} />
+              Demo mode
+            </span>
           </div>
         )}
 
-        <TopBar isDemoMode={isDemoMode} geography={surveyAnswers.geography} />
+        <TopBar />
 
         {appState === "empty" && (
           <EmptyState idea={idea} onIdeaChange={setIdea} onSubmit={handleSubmit} />

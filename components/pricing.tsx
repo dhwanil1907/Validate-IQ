@@ -28,7 +28,7 @@ const plans = [
   {
     name: "Builder",
     subtitle: "For active founders & hackathon teams",
-    monthly: 12,
+    monthly: 17,
     annualMonthly: 8,
     annualBilled: 96,
     features: [

@@ -160,10 +160,22 @@ function renderMarkdown(text: string): React.ReactNode {
   )
 }
 
+function extractGrowthRate(val: string): string {
+  const match = val.match(/[\d.,]+\s*%/)
+  return match ? match[0] : (val.length > 15 ? val.slice(0, 15) + "…" : val)
+}
+
 function extractMarketValue(val: string): string {
   if (!val) return "—"
-  const match = val.match(/\$[\d.,]+\s*[BMKTbmkt]+/)
-  if (match) return match[0].trim()
+  const dollarMatch = val.match(/\$[\d.,]+\s*[BMKTbmkt]+/)
+  if (dollarMatch) return dollarMatch[0].trim()
+  const usdMatch = val.match(/USD\s*([\d.,]+)\s*(trillion|billion|million|thousand)/i)
+  if (usdMatch) {
+    const num = usdMatch[1]
+    const unit = usdMatch[2].toLowerCase()
+    const suffix = unit === "trillion" ? "T" : unit === "billion" ? "B" : unit === "million" ? "M" : "K"
+    return `$${num}${suffix}`
+  }
   return val.length > 12 ? val.slice(0, 12) + "…" : val
 }
 
@@ -297,7 +309,7 @@ function SummaryCard({ verdict, entryScore }: { verdict: ReportData["verdict"]; 
       {verdict.nextAction && (
         <>
           <div className="h-px w-full" style={{ background: "#2A2D35" }} />
-          <p className="line-clamp-2" style={{ fontSize: "12px", lineHeight: "1.65", color: "#9CA3AF" }}>
+          <p style={{ fontSize: "12px", lineHeight: "1.65", color: "#9CA3AF" }}>
             <span style={{ color: "#10B981", fontWeight: 600 }}>→ Next: </span>
             {verdict.nextAction}
           </p>
@@ -695,7 +707,7 @@ function CardShell({
       <div className="flex items-center justify-between">
         <span className="text-white" style={{ fontSize: "16px", fontWeight: 600, letterSpacing: "-0.2px" }}>{title}</span>
         <div className="flex items-center gap-1.5">
-          {confidence && <ConfidenceBadge level={confidence} />}
+          {confidence && confidence !== "High" && <ConfidenceBadge level={confidence} />}
           <EditButton onClick={onEdit} />
         </div>
       </div>
@@ -729,12 +741,22 @@ function Card1Snapshot({
         </p>
       </div>
       <div className="flex items-center gap-1.5 flex-wrap">
-        <span
-          className="px-2 py-0.5 rounded-full border font-medium"
-          style={{ fontSize: "10px", background: "rgba(5,150,105,0.12)", borderColor: "#10B98140", color: "#34D399" }}
-        >
-          Clarity {data.clarityScore}/10
-        </span>
+        {(() => {
+          const clarityColors =
+            data.clarityScore >= 8
+              ? { bg: "rgba(5,150,105,0.12)", border: "#10B98140", color: "#34D399" }
+              : data.clarityScore >= 4
+              ? { bg: "rgba(180,120,0,0.12)", border: "#92400E40", color: "#FCD34D" }
+              : { bg: "rgba(153,27,27,0.12)", border: "#991B1B40", color: "#F87171" }
+          return (
+            <span
+              className="px-2 py-0.5 rounded-full border font-medium"
+              style={{ fontSize: "10px", background: clarityColors.bg, borderColor: clarityColors.border, color: clarityColors.color }}
+            >
+              Clarity {data.clarityScore}/10
+            </span>
+          )
+        })()}
       </div>
     </CardShell>
   )
@@ -773,7 +795,7 @@ function Card2Market({
           <span
             style={{ fontSize: "12px", fontWeight: 500, padding: "4px 12px", borderRadius: "99px", background: "#052E16", color: "#4ADE80" }}
           >
-            {data.growthRate}
+            {extractGrowthRate(data.growthRate)}
           </span>
         )}
         {data.marketTiming && (
@@ -1046,32 +1068,25 @@ export default function ReportPage() {
       setSurvey(surveyParsed)
       setIsDemoMode(demo)
 
-      // Save to persistent saved reports (deduplicate by idea + calendar day)
+      // Save to persistent saved reports — deduplicate by idea text (normalized)
       const existing = JSON.parse(localStorage.getItem("validateiq_saved_reports") || "[]")
-      const today = new Date().toISOString().slice(0, 10)
-      const alreadySaved = existing.some(
-        (r: { idea: string; date: string }) =>
-          r.idea === ideaStr && r.date.slice(0, 10) === today
-      )
-      if (!alreadySaved) {
-        const newEntry = {
-          id: Date.now().toString(),
-          idea: ideaStr,
-          date: new Date().toISOString(),
-          verdict: parsed.verdict?.verdict ?? "CONDITIONAL GO",
-          viabilityScore: parsed.verdict?.viabilityScore ?? 0,
-          report: parsed,
-          survey: surveyParsed,
-        }
-        const updated = [newEntry, ...existing].slice(0, 10)
-        localStorage.setItem("validateiq_saved_reports", JSON.stringify(updated))
-        setReportDate(newEntry.date)
-      } else {
-        const match = existing.find(
-          (r: { idea: string; date: string }) => r.idea === ideaStr
-        )
-        setReportDate(match?.date ?? new Date().toISOString())
+      const normalizedIdea = ideaStr.trim().toLowerCase()
+      const newEntry = {
+        id: Date.now().toString(),
+        idea: ideaStr,
+        date: new Date().toISOString(),
+        verdict: parsed.verdict?.verdict ?? "CONDITIONAL GO",
+        viabilityScore: parsed.verdict?.viabilityScore ?? 0,
+        report: parsed,
+        survey: surveyParsed,
       }
+      // Remove any existing entry with the same idea, then prepend the latest
+      const deduped = (existing as { idea: string }[]).filter(
+        (r) => r.idea.trim().toLowerCase() !== normalizedIdea
+      )
+      const updated = [newEntry, ...deduped].slice(0, 10)
+      localStorage.setItem("validateiq_saved_reports", JSON.stringify(updated))
+      setReportDate(newEntry.date)
     } catch {
       router.replace("/workspace")
     }
