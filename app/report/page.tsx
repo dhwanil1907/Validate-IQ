@@ -96,14 +96,59 @@ function stripCitations(value: unknown): unknown {
   return value
 }
 
-function renderMarkdown(text: string): React.ReactNode {
+function renderInline(text: string): React.ReactNode {
   const parts = text.split(/(\*\*[^*]+\*\*)/g)
-  return parts.map((part, i) => {
-    if (part.startsWith("**") && part.endsWith("**")) {
-      return <strong key={i} style={{ color: "#ffffff" }}>{part.slice(2, -2)}</strong>
-    }
-    return part
-  })
+  return parts.map((part, i) =>
+    part.startsWith("**") && part.endsWith("**")
+      ? <strong key={i} style={{ color: "#ffffff", fontWeight: 600 }}>{part.slice(2, -2)}</strong>
+      : part
+  )
+}
+
+function renderMarkdown(text: string): React.ReactNode {
+  const lines = text.split("\n").filter((l) => l.trim() !== "")
+  return (
+    <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+      {lines.map((line, i) => {
+        const trimmed = line.trim()
+
+        // Bullet line: starts with -
+        if (trimmed.startsWith("- ")) {
+          return (
+            <div key={i} style={{ display: "flex", gap: 6, alignItems: "flex-start" }}>
+              <span style={{ color: "#059669", fontSize: 10, marginTop: 2, flexShrink: 0 }}>●</span>
+              <span style={{ color: "#94A3B8", fontSize: 12, lineHeight: 1.5 }}>{renderInline(trimmed.slice(2))}</span>
+            </div>
+          )
+        }
+
+        // Today line: starts with →
+        if (trimmed.startsWith("→")) {
+          return (
+            <div key={i} style={{
+              marginTop: 2,
+              padding: "5px 8px",
+              borderRadius: 6,
+              background: "#0D2318",
+              border: "1px solid #1E4030",
+              fontSize: 11,
+              color: "#34D399",
+              lineHeight: 1.5,
+            }}>
+              {renderInline(trimmed)}
+            </div>
+          )
+        }
+
+        // Normal / bold heading line
+        return (
+          <p key={i} style={{ margin: 0, fontSize: 12, lineHeight: 1.55, color: "#94A3B8" }}>
+            {renderInline(trimmed)}
+          </p>
+        )
+      })}
+    </div>
+  )
 }
 
 function extractMarketValue(val: string): string {
