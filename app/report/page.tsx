@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react"
 import { useRouter } from "next/navigation"
 import { ArrowUp, ArrowLeft, Home } from "lucide-react"
 import { toast } from "sonner"
+import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer } from "recharts"
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -163,6 +164,50 @@ function renderMarkdown(text: string): React.ReactNode {
 function extractGrowthRate(val: string): string {
   const match = val.match(/[\d.,]+\s*%/)
   return match ? match[0] : (val.length > 15 ? val.slice(0, 15) + "…" : val)
+}
+
+function buildTrendData(growthRate: string, timing: string) {
+  const match = growthRate.match(/([\d.]+)/)
+  const rate = match ? parseFloat(match[1]) / 100 : 0.15
+  const years = ["2020", "2021", "2022", "2023", "2024", "2025", "2026"]
+  let base = 100
+  return years.map((year, i) => {
+    const noise = 1 + (Math.sin(i * 2.3) * 0.04)
+    const multiplier = timing === "Late" ? Math.max(1, 1 + rate * noise * (1 - i * 0.08)) : 1 + rate * noise
+    if (i > 0) base = base * multiplier
+    return { year, value: Math.round(base) }
+  })
+}
+
+function TrendChart({ growthRate, timing }: { growthRate: string; timing: string }) {
+  const data = buildTrendData(growthRate, timing)
+  const color = timing === "Early" ? "#60A5FA" : timing === "Peak" ? "#FCD34D" : "#F87171"
+  return (
+    <div>
+      <p className="uppercase tracking-wide mb-2" style={{ fontSize: "12px", fontWeight: 500, color: "#6B7280" }}>
+        Market trend
+      </p>
+      <ResponsiveContainer width="100%" height={100}>
+        <AreaChart data={data} margin={{ top: 4, right: 4, left: -28, bottom: 0 }}>
+          <defs>
+            <linearGradient id="trendGrad" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="5%" stopColor={color} stopOpacity={0.25} />
+              <stop offset="95%" stopColor={color} stopOpacity={0} />
+            </linearGradient>
+          </defs>
+          <XAxis dataKey="year" tick={{ fontSize: 10, fill: "#4B5563" }} axisLine={false} tickLine={false} />
+          <YAxis tick={{ fontSize: 10, fill: "#4B5563" }} axisLine={false} tickLine={false} />
+          <Tooltip
+            contentStyle={{ background: "#1C1F26", border: "1px solid #2A2D35", borderRadius: 6, fontSize: 11 }}
+            labelStyle={{ color: "#9CA3AF" }}
+            itemStyle={{ color }}
+            formatter={(v: number) => [`${v}`, "Index"]}
+          />
+          <Area type="monotone" dataKey="value" stroke={color} strokeWidth={2} fill="url(#trendGrad)" dot={false} />
+        </AreaChart>
+      </ResponsiveContainer>
+    </div>
+  )
 }
 
 function extractMarketValue(val: string): string {
@@ -719,7 +764,6 @@ function CardShell({
         <span className="text-white" style={{ fontSize: "16px", fontWeight: 600, letterSpacing: "-0.2px" }}>{title}</span>
         <div className="flex items-center gap-1.5">
           {confidence && confidence !== "High" && <ConfidenceBadge level={confidence} />}
-          <EditButton onClick={onEdit} />
         </div>
       </div>
       {children}
@@ -738,15 +782,15 @@ function Card1Snapshot({
 }) {
   return (
     <CardShell title="Idea snapshot" confidence={confidence} onEdit={onEdit}>
-      <p style={{ fontSize: "14px", fontWeight: 400, lineHeight: "1.75", color: "#E4E4E7" }}>
+      <p style={{ fontSize: "16px", fontWeight: 400, lineHeight: "1.75", color: "#E4E4E7" }}>
         {data.oneLiner}
       </p>
       <div className="flex flex-col gap-2">
-        <p style={{ fontSize: "13px", fontWeight: 400, lineHeight: "1.75", color: "#9CA3AF" }}>
+        <p style={{ fontSize: "15px", fontWeight: 400, lineHeight: "1.75", color: "#9CA3AF" }}>
           <span style={{ color: "#34D399", fontWeight: 600 }}>Problem: </span>
           {data.problem}
         </p>
-        <p style={{ fontSize: "13px", fontWeight: 400, lineHeight: "1.75", color: "#9CA3AF" }}>
+        <p style={{ fontSize: "15px", fontWeight: 400, lineHeight: "1.75", color: "#9CA3AF" }}>
           <span style={{ color: "#60A5FA", fontWeight: 600 }}>Customer: </span>
           {data.targetCustomer}
         </p>
@@ -762,7 +806,7 @@ function Card1Snapshot({
           return (
             <span
               className="px-2 py-0.5 rounded-full border font-medium"
-              style={{ fontSize: "10px", background: clarityColors.bg, borderColor: clarityColors.border, color: clarityColors.color }}
+              style={{ fontSize: "12px", background: clarityColors.bg, borderColor: clarityColors.border, color: clarityColors.color }}
             >
               Clarity {data.clarityScore}/10
             </span>
@@ -789,22 +833,26 @@ function Card2Market({
         style={{ background: "#111318" }}
       >
         {[
-          { label: "TAM", value: data.tam },
-          { label: "SAM", value: data.sam },
-          { label: "SOM", value: data.som },
-        ].map(({ label, value }) => (
+          { label: "TAM", desc: "Total addressable market", value: data.tam },
+          { label: "SAM", desc: "Serviceable addressable market", value: data.sam },
+          { label: "SOM", desc: "Serviceable obtainable market", value: data.som },
+        ].map(({ label, desc, value }) => (
           <div key={label} className="flex flex-col items-center py-1">
             <span className="font-bold text-white" style={{ fontSize: "28px" }}>
               {extractMarketValue(value)}
             </span>
-            <span style={{ fontSize: "11px", color: "#6B7280" }}>{label}</span>
+            <span style={{ fontSize: "13px", color: "#6B7280" }}>{label}</span>
+            <span style={{ fontSize: "11px", color: "#4B5563" }} className="text-center mt-0.5">{desc}</span>
           </div>
         ))}
       </div>
+      {data.growthRate && (
+        <TrendChart growthRate={data.growthRate} timing={data.marketTiming ?? "Early"} />
+      )}
       <div className="flex items-center gap-1.5 flex-wrap">
         {data.growthRate && (
           <span
-            style={{ fontSize: "12px", fontWeight: 500, padding: "4px 12px", borderRadius: "99px", background: "#052E16", color: "#4ADE80" }}
+            style={{ fontSize: "13px", fontWeight: 500, padding: "4px 12px", borderRadius: "99px", background: "#052E16", color: "#4ADE80" }}
           >
             {extractGrowthRate(data.growthRate)}
           </span>
@@ -812,7 +860,7 @@ function Card2Market({
         {data.marketTiming && (
           <span
             style={{
-              fontSize: "12px", fontWeight: 500, padding: "4px 12px", borderRadius: "99px",
+              fontSize: "13px", fontWeight: 500, padding: "4px 12px", borderRadius: "99px",
               background: data.marketTiming === "Early" ? "#0A1E3A" : data.marketTiming === "Peak" ? "#1C1007" : "#1C0507",
               color: data.marketTiming === "Early" ? "#60A5FA" : data.marketTiming === "Peak" ? "#FCD34D" : "#F87171",
             }}
@@ -821,7 +869,21 @@ function Card2Market({
           </span>
         )}
       </div>
-      <p style={{ fontSize: "13px", fontWeight: 400, lineHeight: "1.75", color: "#9CA3AF" }}>
+      <div className="flex items-center gap-1.5 flex-wrap">
+        {[
+          { label: "TAM", desc: "Everyone who could ever use this" },
+          { label: "SAM", desc: "The slice you can realistically reach" },
+          { label: "SOM", desc: "What you can capture in year 1–3" },
+        ].map(({ label, desc }) => (
+          <span
+            key={label}
+            style={{ fontSize: "13px", padding: "4px 12px", borderRadius: "99px", background: "#1C1F26", color: "#6B7280", border: "1px solid #2A2D35" }}
+          >
+            <span style={{ color: "#9CA3AF", fontWeight: 600 }}>{label}</span> — {desc}
+          </span>
+        ))}
+      </div>
+      <p style={{ fontSize: "15px", fontWeight: 400, lineHeight: "1.75", color: "#9CA3AF" }}>
         {data.marketTimingReason}
       </p>
     </CardShell>
@@ -847,10 +909,10 @@ function Card3Competitors({
             style={{ borderColor: "#2A2D35" }}
           >
             <div className="flex flex-col gap-0.5 min-w-0">
-              <span className="text-white" style={{ fontSize: "14px", fontWeight: 600 }}>
+              <span className="text-white" style={{ fontSize: "15px", fontWeight: 600 }}>
                 {c.name}
               </span>
-              <span style={{ fontSize: "11px", color: "#6B7280" }}>
+              <span style={{ fontSize: "13px", color: "#6B7280" }}>
                 {c.funding} · {c.pricing} · {c.lastActivity}
               </span>
             </div>
@@ -861,10 +923,10 @@ function Card3Competitors({
         className="rounded-md p-2 mt-1"
         style={{ background: "#111318", border: "0.5px solid #2A2D35" }}
       >
-        <p className="font-bold mb-1" style={{ fontSize: "10px", color: "#34D399" }}>
+        <p className="font-bold mb-1" style={{ fontSize: "12px", color: "#34D399" }}>
           Gap identified
         </p>
-        <p style={{ fontSize: "13px", fontWeight: 400, lineHeight: "1.75", color: "#9CA3AF" }}>
+        <p style={{ fontSize: "15px", fontWeight: 400, lineHeight: "1.75", color: "#9CA3AF" }}>
           {data.gapStatement}
         </p>
       </div>
@@ -896,29 +958,29 @@ function Card4EntryScore({
           {getBarrierLevel(score)}
         </span>
       </div>
-      <p style={{ fontSize: "11px", color: "#6B7280" }}>Based on your founder profile</p>
+      <p style={{ fontSize: "13px", color: "#6B7280" }}>Based on your founder profile</p>
       <div className="w-full" style={{ height: "6px", background: "#2A2D35", borderRadius: "99px" }}>
         <div style={{ width: `${(score / 10) * 100}%`, height: "100%", borderRadius: "99px", background: bc.color }} />
       </div>
       <div className="flex justify-between mt-1">
-        <span style={{ fontSize: "9px", color: "#6B7280" }}>Low Risk</span>
-        <span style={{ fontSize: "9px", color: "#6B7280" }}>High Risk</span>
+        <span style={{ fontSize: "11px", color: "#6B7280" }}>Low Risk</span>
+        <span style={{ fontSize: "11px", color: "#6B7280" }}>High Risk</span>
       </div>
       <div className="flex flex-col gap-1.5 mt-1">
-        <p className="uppercase tracking-wide" style={{ fontSize: "10px", fontWeight: 500, color: "#6B7280" }}>Barriers</p>
+        <p className="uppercase tracking-wide" style={{ fontSize: "12px", fontWeight: 500, color: "#6B7280" }}>Barriers</p>
         {(data.barriers ?? []).map((b, i) => (
           <div key={i} className="flex gap-1.5 items-start">
             <Dot color="#F87171" />
-            <span style={{ fontSize: "13px", fontWeight: 400, lineHeight: "1.75", color: "#9CA3AF" }}>{b}</span>
+            <span style={{ fontSize: "15px", fontWeight: 400, lineHeight: "1.75", color: "#9CA3AF" }}>{b}</span>
           </div>
         ))}
       </div>
       <div className="flex flex-col gap-1.5 mt-1">
-        <p className="uppercase tracking-wide" style={{ fontSize: "10px", fontWeight: 500, color: "#6B7280" }}>Advantages</p>
+        <p className="uppercase tracking-wide" style={{ fontSize: "12px", fontWeight: 500, color: "#6B7280" }}>Advantages</p>
         {(data.advantages ?? []).map((a, i) => (
           <div key={i} className="flex gap-1.5 items-start">
             <Dot color="#34D399" />
-            <span style={{ fontSize: "13px", fontWeight: 400, lineHeight: "1.75", color: "#9CA3AF" }}>{a}</span>
+            <span style={{ fontSize: "15px", fontWeight: 400, lineHeight: "1.75", color: "#9CA3AF" }}>{a}</span>
           </div>
         ))}
       </div>
@@ -949,7 +1011,7 @@ function Card5Verdict({
         </span>
       </div>
       <div className="flex flex-col gap-0.5">
-        <span className="uppercase" style={{ fontSize: "10px", fontWeight: 500, color: "#6B7280", letterSpacing: "0.06em" }}>Viability score</span>
+        <span className="uppercase" style={{ fontSize: "12px", fontWeight: 500, color: "#6B7280", letterSpacing: "0.06em" }}>Viability score</span>
         <span style={{ fontSize: "36px", fontWeight: 700, color: vc.color }}>
           {score}<span style={{ fontSize: "16px", fontWeight: 400, color: "#64748B" }}>/100</span>
         </span>
@@ -958,28 +1020,28 @@ function Card5Verdict({
         <div style={{ width: `${score}%`, height: "100%", borderRadius: "99px", background: vc.color }} />
       </div>
       <div className="flex justify-between mt-1">
-        <span style={{ fontSize: "9px", color: "#6B7280" }}>Low Risk</span>
-        <span style={{ fontSize: "9px", color: "#6B7280" }}>High Risk</span>
+        <span style={{ fontSize: "11px", color: "#6B7280" }}>Low Risk</span>
+        <span style={{ fontSize: "11px", color: "#6B7280" }}>High Risk</span>
       </div>
       <div className="flex flex-col gap-1.5 mt-1">
-        <p className="uppercase tracking-wide" style={{ fontSize: "10px", fontWeight: 500, color: "#6B7280" }}>
+        <p className="uppercase tracking-wide" style={{ fontSize: "12px", fontWeight: 500, color: "#6B7280" }}>
           Why this verdict
         </p>
         {(data.topReasons ?? []).map((r, i) => (
           <div key={i} className="flex gap-1.5 items-start">
             <Dot color="#34D399" />
-            <span style={{ fontSize: "13px", fontWeight: 400, lineHeight: "1.75", color: "#9CA3AF" }}>{r}</span>
+            <span style={{ fontSize: "15px", fontWeight: 400, lineHeight: "1.75", color: "#9CA3AF" }}>{r}</span>
           </div>
         ))}
       </div>
       <div className="flex flex-col gap-1.5 mt-1">
-        <p className="uppercase tracking-wide" style={{ fontSize: "10px", fontWeight: 500, color: "#6B7280" }}>
+        <p className="uppercase tracking-wide" style={{ fontSize: "12px", fontWeight: 500, color: "#6B7280" }}>
           Key risks
         </p>
         {(data.topRisks ?? []).map((r, i) => (
           <div key={i} className="flex gap-1.5 items-start">
             <Dot color="#F87171" />
-            <span style={{ fontSize: "13px", fontWeight: 400, lineHeight: "1.75", color: "#9CA3AF" }}>{r}</span>
+            <span style={{ fontSize: "15px", fontWeight: 400, lineHeight: "1.75", color: "#9CA3AF" }}>{r}</span>
           </div>
         ))}
       </div>
@@ -988,8 +1050,8 @@ function Card5Verdict({
           className="rounded-md p-2 mt-1"
           style={{ background: "#111318", border: "0.5px solid #2A2D35" }}
         >
-          <p className="font-bold mb-1" style={{ fontSize: "10px", color: "#34D399" }}>Next action</p>
-          <p style={{ fontSize: "13px", fontWeight: 400, lineHeight: "1.75", color: "#9CA3AF" }}>{data.nextAction}</p>
+          <p className="font-bold mb-1" style={{ fontSize: "12px", color: "#34D399" }}>Next action</p>
+          <p style={{ fontSize: "15px", fontWeight: 400, lineHeight: "1.75", color: "#9CA3AF" }}>{data.nextAction}</p>
         </div>
       )}
     </CardShell>
@@ -1015,13 +1077,13 @@ function Card6DevilsAdvocate({
             style={{ background: "#0D0808", borderColor: "#2A0A0A" }}
           >
             <div className="flex items-center justify-between mb-1">
-              <span className="font-bold" style={{ fontSize: "13px", color: "#F87171" }}>{f.name}</span>
-              <span style={{ fontSize: "11px", color: "#6B7280" }}>{f.year}</span>
+              <span className="font-bold" style={{ fontSize: "15px", color: "#F87171" }}>{f.name}</span>
+              <span style={{ fontSize: "13px", color: "#6B7280" }}>{f.year}</span>
             </div>
-            <p className="mb-0.5" style={{ fontSize: "13px", lineHeight: "1.7", color: "#6B7280" }}>
+            <p className="mb-0.5" style={{ fontSize: "15px", lineHeight: "1.7", color: "#6B7280" }}>
               <span className="font-bold" style={{ color: "#9CA3AF" }}>What: </span>{f.what}
             </p>
-            <p style={{ fontSize: "13px", lineHeight: "1.7", color: "#6B7280" }}>
+            <p style={{ fontSize: "15px", lineHeight: "1.7", color: "#6B7280" }}>
               <span className="font-bold" style={{ color: "#9CA3AF" }}>Why: </span>{f.why}
             </p>
           </div>
@@ -1031,11 +1093,11 @@ function Card6DevilsAdvocate({
         className="rounded-md p-2 border mt-1"
         style={{ background: "#0A0808", borderColor: "#2A0A0A" }}
       >
-        <p className="font-bold mb-1" style={{ fontSize: "10px", color: "#F87171" }}>The pattern</p>
-        <p style={{ fontSize: "13px", lineHeight: "1.7", color: "#6B7280" }}>{data.thePattern}</p>
+        <p className="font-bold mb-1" style={{ fontSize: "12px", color: "#F87171" }}>The pattern</p>
+        <p style={{ fontSize: "15px", lineHeight: "1.7", color: "#6B7280" }}>{data.thePattern}</p>
       </div>
       {data.survivalRule && (
-        <p className="italic mt-1" style={{ fontSize: "13px", lineHeight: "1.7", color: "#6B7280" }}>
+        <p className="italic mt-1" style={{ fontSize: "15px", lineHeight: "1.7", color: "#6B7280" }}>
           {data.survivalRule}
         </p>
       )}
@@ -1055,7 +1117,6 @@ export default function ReportPage() {
   const [survey, setSurvey] = useState<Survey | null>(null)
   const [isDemoMode, setIsDemoMode] = useState(false)
   const [activeTab, setActiveTab] = useState<"profile" | "sources">("profile")
-  const [activeReportTab, setActiveReportTab] = useState<"overview" | "market" | "competition" | "entry" | "verdict">("overview")
   const [chatInput, setChatInput] = useState("")
   const [pdfLoading, setPdfLoading] = useState(false)
   const [reportDate, setReportDate] = useState<string>("")
@@ -1116,50 +1177,33 @@ export default function ReportPage() {
     if (!rightPanelRef.current || pdfLoading) return
     setPdfLoading(true)
     try {
-      // Use html-to-image which has flawless support for Flexbox gaps and Tailwind OKLCH colors via SVG foreignObject rendering
       const { toPng } = await import("html-to-image")
       const { default: jsPDF } = await import("jspdf")
 
-      // Ensure the panel is at its actual rendering size before cloning (temporarily undo overflow so it doesn't crop)
       const element = rightPanelRef.current
-      const originalOverflow = element.style.overflowY
-      const originalWidth = element.style.width
-      const originalMaxWidth = element.style.maxWidth
-      const originalPadding = element.style.padding
 
-      // Force a fixed "document" width so the layout isn't incredibly wide (which causes squishing on A4)
+      // Expand overflow so full content renders, not just the visible portion
+      const prevOverflow = element.style.overflowY
+      const prevHeight = element.style.height
+      const prevMaxHeight = element.style.maxHeight
       element.style.overflowY = "visible"
-      element.style.width = "800px"
-      element.style.maxWidth = "800px"
-      element.style.padding = "24px 32px" // Add more breathing room for print
-
-      // Give the browser DOM a tiny fraction of a second to reflow the flex grid at 800px
-      await new Promise((resolve) => setTimeout(resolve, 20))
+      element.style.height = "auto"
+      element.style.maxHeight = "none"
+      await new Promise((resolve) => setTimeout(resolve, 80))
 
       const domWidth = element.scrollWidth
       const domHeight = element.scrollHeight
 
-      // Generate a super crisp 2x scale PNG
       const dataUrl = await toPng(element, {
         backgroundColor: "#000000",
-        pixelRatio: 2, 
+        pixelRatio: 2,
         width: domWidth,
         height: domHeight,
-        filter: (node) => {
-          // Exclude elements with print-hide class (like topbar buttons)
-          return !node.classList?.contains("print-hide")
-        },
-        style: {
-          transform: "scale(1)", // reset any transforms
-          margin: "0",
-        }
+      }).finally(() => {
+        element.style.overflowY = prevOverflow
+        element.style.height = prevHeight
+        element.style.maxHeight = prevMaxHeight
       })
-
-      // Restore UI styles
-      element.style.overflowY = originalOverflow
-      element.style.width = originalWidth
-      element.style.maxWidth = originalMaxWidth
-      element.style.padding = originalPadding
 
       // Now create the PDF using the locked mathematical dimensions
       const pdf = new jsPDF({ orientation: "portrait", unit: "px", format: "a4" })
@@ -1259,27 +1303,21 @@ export default function ReportPage() {
         style={{ width: 300, background: "#000000", borderColor: "#2A2D35" }}
       >
         {/* Logo + idea */}
-        <div className="px-3 pt-3 pb-2 border-b shrink-0" style={{ borderColor: "#2A2D35" }}>
-          <div className="flex items-center gap-2 mb-2">
-            <button
-              onClick={() => router.push("/workspace")}
-              className="w-6 h-6 rounded-md flex items-center justify-center shrink-0 transition-colors hover:bg-white/10"
-              style={{ color: "#9CA3AF" }}
-              title="Back to Workspace"
-            >
-              <ArrowLeft size={16} />
-            </button>
-            <div
-              className="w-6 h-6 rounded-md flex items-center justify-center text-white text-[10px] font-bold shrink-0"
-              style={{ background: "#10B981" }}
-            >
-              V
-            </div>
-            <span className="text-base font-semibold text-white">Verdict</span>
+        <div className="flex items-center justify-between px-3 py-3.5 border-b shrink-0" style={{ borderColor: "#2A2D35", minHeight: 56 }}>
+          <div className="flex flex-col gap-1 min-w-0 flex-1">
+            <span className="text-base font-bold text-white">Verdict</span>
+            <p className="text-xs line-clamp-1" style={{ color: "#6B7280" }}>
+              {idea}
+            </p>
           </div>
-          <p className="text-sm leading-relaxed line-clamp-2" style={{ color: "#9CA3AF" }}>
-            {idea}
-          </p>
+          <button
+            onClick={() => router.push("/workspace")}
+            className="w-7 h-7 rounded-md flex items-center justify-center shrink-0 transition-colors hover:bg-white/10 ml-2"
+            style={{ color: "#9CA3AF" }}
+            title="Back to Workspace"
+          >
+            <ArrowLeft size={15} />
+          </button>
         </div>
 
         {/* Tabs */}
@@ -1288,7 +1326,7 @@ export default function ReportPage() {
             <button
               key={tab}
               onClick={() => setActiveTab(tab)}
-              className="flex-1 py-2 text-sm font-medium transition-colors border-b-[3px]"
+              className="flex-1 py-3 text-sm font-medium transition-colors border-b-[3px]"
               style={{
                 borderColor: activeTab === tab ? "#10B981" : "transparent",
                 color: activeTab === tab ? "#ffffff" : "#6B7280",
@@ -1375,99 +1413,54 @@ export default function ReportPage() {
           </div>
         </div>
 
-        {/* Tab bar */}
-        {(() => {
-          const TABS = [
-            { id: "overview", label: "Overview" },
-            { id: "market", label: "Market" },
-            { id: "competition", label: "Competition" },
-            { id: "entry", label: "Entry" },
-            { id: "verdict", label: "Verdict" },
-          ] as const
-          type TabId = typeof TABS[number]["id"]
-          return (
-            <>
-              <div className="flex border-b shrink-0 px-5 print-hide" style={{ borderColor: "#2A2D35" }}>
-                {TABS.map((t) => (
-                  <button
-                    key={t.id}
-                    onClick={() => setActiveReportTab(t.id)}
-                    className="px-4 py-3 text-sm font-medium transition-colors border-b-2 -mb-px"
-                    style={{
-                      borderColor: activeReportTab === t.id ? "#10B981" : "transparent",
-                      color: activeReportTab === t.id ? "#ffffff" : "#6B7280",
-                    }}
-                  >
-                    {t.label}
-                  </button>
-                ))}
-              </div>
-
-              {/* Tab content */}
-              <div
-                ref={rightPanelRef}
-                className="flex-1 overflow-y-auto flex flex-col gap-3.5"
-                style={{ padding: "16px 18px" }}
-              >
-                {isDemoMode && (
-                  <div
-                    className="text-[10px] px-3 py-1.5 rounded-md border"
-                    style={{ background: "#1C1F26", borderColor: "#2A2D35", color: "#34D399", borderWidth: "0.5px" }}
-                  >
-                    Demo mode — results are pre-loaded for speed
-                  </div>
-                )}
-
-                {activeReportTab === "overview" && (
-                  <>
-                    <SummaryCard verdict={report.verdict} entryScore={report.entryScore} />
-                    <Card1Snapshot
-                      data={report.snapshot}
-                      confidence={report.confidence?.snapshot ?? "Medium"}
-                      onEdit={() => focusChatInput(CARD_EDIT_MESSAGES.snapshot)}
-                    />
-                  </>
-                )}
-                {activeReportTab === "market" && (
-                  <Card2Market
-                    data={report.market}
-                    confidence={report.confidence?.market ?? "Medium"}
-                    onEdit={() => focusChatInput(CARD_EDIT_MESSAGES.market)}
-                  />
-                )}
-                {activeReportTab === "competition" && (
-                  <Card3Competitors
-                    data={report.competitors}
-                    confidence={report.confidence?.competitors ?? "Medium"}
-                    onEdit={() => focusChatInput(CARD_EDIT_MESSAGES.competitors)}
-                  />
-                )}
-                {activeReportTab === "entry" && (
-                  <Card4EntryScore
-                    data={report.entryScore}
-                    confidence={report.confidence?.entryScore ?? "Medium"}
-                    onEdit={() => focusChatInput(CARD_EDIT_MESSAGES.entryScore)}
-                  />
-                )}
-                {activeReportTab === "verdict" && (
-                  <>
-                    <Card5Verdict
-                      data={report.verdict}
-                      confidence={report.confidence?.verdict ?? "Medium"}
-                      onEdit={() => focusChatInput(CARD_EDIT_MESSAGES.verdict)}
-                    />
-                    <Card6DevilsAdvocate
-                      data={report.devilsAdvocate}
-                      confidence={report.confidence?.devilsAdvocate ?? "Medium"}
-                      onEdit={() => focusChatInput(CARD_EDIT_MESSAGES.devilsAdvocate)}
-                    />
-                  </>
-                )}
-              </div>
-            </>
-          )
-        })()}
+        {/* Scrolling report content */}
+        <div
+          ref={rightPanelRef}
+          className="flex-1 overflow-y-auto flex flex-col gap-3.5"
+          style={{ padding: "16px 18px" }}
+        >
+          {isDemoMode && (
+            <div
+              className="text-[10px] px-3 py-1.5 rounded-md border"
+              style={{ background: "#1C1F26", borderColor: "#2A2D35", color: "#34D399", borderWidth: "0.5px" }}
+            >
+              Demo mode — results are pre-loaded for speed
+            </div>
+          )}
+          <SummaryCard verdict={report.verdict} entryScore={report.entryScore} />
+          <Card1Snapshot
+            data={report.snapshot}
+            confidence={report.confidence?.snapshot ?? "Medium"}
+            onEdit={() => focusChatInput(CARD_EDIT_MESSAGES.snapshot)}
+          />
+          <Card2Market
+            data={report.market}
+            confidence={report.confidence?.market ?? "Medium"}
+            onEdit={() => focusChatInput(CARD_EDIT_MESSAGES.market)}
+          />
+          <Card3Competitors
+            data={report.competitors}
+            confidence={report.confidence?.competitors ?? "Medium"}
+            onEdit={() => focusChatInput(CARD_EDIT_MESSAGES.competitors)}
+          />
+          <Card4EntryScore
+            data={report.entryScore}
+            confidence={report.confidence?.entryScore ?? "Medium"}
+            onEdit={() => focusChatInput(CARD_EDIT_MESSAGES.entryScore)}
+          />
+          <Card5Verdict
+            data={report.verdict}
+            confidence={report.confidence?.verdict ?? "Medium"}
+            onEdit={() => focusChatInput(CARD_EDIT_MESSAGES.verdict)}
+          />
+          <Card6DevilsAdvocate
+            data={report.devilsAdvocate}
+            confidence={report.confidence?.devilsAdvocate ?? "Medium"}
+            onEdit={() => focusChatInput(CARD_EDIT_MESSAGES.devilsAdvocate)}
+          />
+        </div>
       </div>
+
     </div>
   )
 }

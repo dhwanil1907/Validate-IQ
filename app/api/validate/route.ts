@@ -37,7 +37,7 @@ interface PerplexityResponse {
 function buildFounderContext(survey: Survey): string {
   return (
     `Founder profile: Stage=${survey.stage}, Technical=${survey.technical}, ` +
-    `Budget=${survey.budget}, Time=${survey.time}, Network=${survey.network}, ` +
+    `Budget=${survey.budget}, DomainExperience=${survey.time}, Network=${survey.network}, ` +
     `Geography=${survey.geography}. Use this context to personalize every insight ` +
     `specifically for this founder — not a generic founder.`
   )

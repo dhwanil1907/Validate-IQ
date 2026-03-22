@@ -46,7 +46,7 @@ const DEFAULT_SURVEY: SurveyAnswers = {
   stage: "Just an idea",
   technical: "Non-technical",
   budget: "Under $1K",
-  time: "A few hours a week",
+  time: "None — complete outsider",
   network: "No connections",
   geography: "United States",
 }
@@ -73,8 +73,8 @@ const SURVEY_QUESTIONS: {
   },
   {
     key: "time",
-    label: "How much time can you commit?",
-    options: ["A few hours a week", "Nights and weekends", "Part-time (20hrs/week)", "Full-time"],
+    label: "Do you have experience in this industry?",
+    options: ["None — complete outsider", "Some — adjacent or hobbyist", "Strong — worked in this space", "Expert — 5+ years"],
   },
   {
     key: "network",
@@ -153,7 +153,7 @@ function ReportRow({ r, onLoadReport, onStarReport, onDeleteReport, formatDate }
         <div className="min-w-0 flex-1">
           <div className="flex items-center gap-1 mb-0.5 flex-wrap">
             <span className="text-sm text-white truncate">
-              {r.idea.slice(0, 30)}{r.idea.length > 30 ? "…" : ""}
+              {r.idea.slice(0, 45)}{r.idea.length > 45 ? "…" : ""}
             </span>
             <VerdictBadge verdict={r.verdict} />
           </div>
@@ -221,7 +221,7 @@ function Sidebar({
       style={{ background: "#111318", borderColor: "#2A2D35" }}
     >
       {/* Logo */}
-      <div className="flex items-center gap-2.5 px-5 py-5 border-b" style={{ borderColor: "#2A2D35" }}>
+      <div className="flex items-center gap-2.5 px-5 h-14 border-b shrink-0" style={{ borderColor: "#2A2D35" }}>
         <LogoMark />
         <span className="font-semibold text-white text-base tracking-tight">Verdict</span>
       </div>
@@ -513,6 +513,24 @@ function EmptyState({
         </kbd>{" "}
         to continue to survey
       </p>
+
+      {/* Example chips */}
+      <div className="flex flex-wrap justify-center gap-2">
+        {[
+          "An AI tool that writes cold emails for SDRs",
+          "A marketplace for freelance video editors",
+          "A Notion plugin that auto-generates weekly reports",
+        ].map((example) => (
+          <button
+            key={example}
+            onClick={() => onIdeaChange(example)}
+            className="text-sm px-3.5 py-1.5 rounded-full border transition-colors hover:border-[#10B981] hover:text-white"
+            style={{ borderColor: "#2A2D35", color: "#6B7280", background: "transparent" }}
+          >
+            {example}
+          </button>
+        ))}
+      </div>
 
     </div>
   )
