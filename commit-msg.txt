@@ -1,8 +1,0 @@
-chore: remove non-functional UI elements
-
-- Remove feature cards (Market Sizing, Competitor Radar, Go/No-Go) from workspace EmptyState.
-- Remove Pivot an Idea and Compare Ideas tabs, keeping only Validate Idea.
-- Remove Attach, Settings, and Options toolbar buttons from textarea.
-- Remove Re-run affected sections button from report sidebar.
-- Remove Settings icon button from report page top bar.
-- Remove dead Docs and Blog links from navbar.
