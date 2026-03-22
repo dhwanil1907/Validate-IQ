@@ -125,6 +125,7 @@ export function Hero() {
             >
               <Button
                 size="lg"
+                onClick={() => router.push("/workspace")}
                 className="h-auto rounded-lg border-0 bg-[#059669] px-6 py-3 text-base font-medium text-white shadow-none transition-[box-shadow,background-color] duration-300 ease-out hover:bg-[#059669] hover:shadow-[0_0_24px_-4px_rgba(52,211,153,0.35)] focus-visible:ring-2 focus-visible:ring-[#059669] focus-visible:ring-offset-2 focus-visible:ring-offset-[#000000]"
               >
                 → Validate My Idea

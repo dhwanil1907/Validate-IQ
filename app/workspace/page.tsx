@@ -24,10 +24,12 @@ import {
 type AppState = "empty" | "loading" | "report"
 
 const LOADING_STEPS = [
-  "Scanning market data…",
-  "Mapping competitors…",
-  "Sizing the opportunity…",
-  "Scoring the gaps…",
+  "Scanning competitors...",
+  "Sizing the market...",
+  "Finding investors...",
+  "Assessing viability...",
+  "Checking failure history...",
+  "Building your report...",
 ]
 
 const RECENT_VALIDATIONS = [
@@ -68,10 +70,10 @@ function Sidebar({ onNewValidation }: { onNewValidation: () => void }) {
   return (
     <aside
       className="fixed top-0 left-0 h-screen w-[280px] flex flex-col border-r z-20"
-      style={{ background: "#050F09", borderColor: "#122B1A" }}
+      style={{ background: "#060B18", borderColor: "#1E2D4A" }}
     >
       {/* Logo */}
-      <div className="flex items-center gap-2.5 px-5 py-5 border-b" style={{ borderColor: "#122B1A" }}>
+      <div className="flex items-center gap-2.5 px-5 py-5 border-b" style={{ borderColor: "#1E2D4A" }}>
         <LogoMark />
         <span className="font-semibold text-white text-base tracking-tight">Validate IQ</span>
       </div>
@@ -81,7 +83,7 @@ function Sidebar({ onNewValidation }: { onNewValidation: () => void }) {
         <button
           onClick={onNewValidation}
           className="w-full flex items-center justify-center gap-2 py-2.5 rounded-lg font-medium text-white text-sm transition-all hover:brightness-110 active:scale-[0.98]"
-          style={{ background: "#059669" }}
+          style={{ background: "#2563EB" }}
         >
           <Plus size={15} />
           New Validation
@@ -99,8 +101,8 @@ function Sidebar({ onNewValidation }: { onNewValidation: () => void }) {
               key={label}
               className="flex items-center gap-2.5 px-3 py-2.5 rounded-lg text-sm text-left transition-colors w-full group"
               style={{
-                background: active ? "rgba(5,150,105,0.12)" : "transparent",
-                color: active ? "#34D399" : "#6B7280",
+                background: active ? "rgba(37,99,235,0.12)" : "transparent",
+                color: active ? "#3B82F6" : "#6B7280",
               }}
               onMouseEnter={(e) => {
                 if (!active) {
@@ -147,11 +149,11 @@ function Sidebar({ onNewValidation }: { onNewValidation: () => void }) {
       </div>
 
       {/* User + Upgrade */}
-      <div className="px-4 py-4 border-t space-y-3" style={{ borderColor: "#122B1A" }}>
+      <div className="px-4 py-4 border-t space-y-3" style={{ borderColor: "#1E2D4A" }}>
         <div className="flex items-center gap-3">
           <div
             className="w-8 h-8 rounded-full flex items-center justify-center font-semibold text-sm shrink-0"
-            style={{ background: "rgba(5,150,105,0.15)", color: "#34D399" }}
+            style={{ background: "rgba(37,99,235,0.15)", color: "#3B82F6" }}
           >
             D
           </div>
@@ -162,14 +164,14 @@ function Sidebar({ onNewValidation }: { onNewValidation: () => void }) {
             </p>
           </div>
         </div>
-        <div className="rounded-lg p-3 border" style={{ background: "#000000", borderColor: "#122B1A" }}>
+        <div className="rounded-lg p-3 border" style={{ background: "#000000", borderColor: "#1E2D4A" }}>
           <p className="text-xs font-medium text-white mb-1">Unlock Builder</p>
           <p className="text-xs mb-3" style={{ color: "#6B7280" }}>
             Unlimited validations, full reports, export to PDF.
           </p>
           <button
             className="w-full py-1.5 rounded-md text-xs font-medium text-white transition-all hover:brightness-110"
-            style={{ background: "#059669" }}
+            style={{ background: "#2563EB" }}
           >
             Get Builder →
           </button>
@@ -185,7 +187,7 @@ function TopBar() {
   return (
     <div
       className="h-14 flex items-center justify-between px-6 border-b shrink-0"
-      style={{ borderColor: "#122B1A" }}
+      style={{ borderColor: "#1E2D4A" }}
     >
       <div className="flex min-w-0 items-center gap-2">
         <span className="text-xs text-[#6B7280]">Validate IQ</span>
@@ -197,14 +199,14 @@ function TopBar() {
       <div className="flex items-center gap-2">
         <button
           className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border text-xs font-medium transition-colors hover:border-[rgba(255,255,255,0.12)]"
-          style={{ borderColor: "#122B1A", color: "#6B7280", background: "transparent" }}
+          style={{ borderColor: "#1E2D4A", color: "#6B7280", background: "transparent" }}
         >
           <Settings size={13} />
           Configuration
         </button>
         <button
           className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border text-xs font-medium transition-colors hover:border-[rgba(255,255,255,0.12)]"
-          style={{ borderColor: "#122B1A", color: "#6B7280", background: "transparent" }}
+          style={{ borderColor: "#1E2D4A", color: "#6B7280", background: "transparent" }}
         >
           <FileText size={13} />
           Export
@@ -223,12 +225,12 @@ function LoadingScreen({ step }: { step: number }) {
       <div className="relative w-16 h-16">
         <div
           className="absolute inset-0 rounded-full border-2 border-transparent animate-spin"
-          style={{ borderTopColor: "#059669", borderRightColor: "rgba(5,150,105,0.3)" }}
+          style={{ borderTopColor: "#2563EB", borderRightColor: "rgba(5,150,105,0.3)" }}
         />
         <div
           className="absolute inset-2 rounded-full border border-transparent animate-spin"
           style={{
-            borderTopColor: "rgba(52,211,153,0.4)",
+            borderTopColor: "rgba(59,130,246,0.4)",
             animationDirection: "reverse",
             animationDuration: "0.8s",
           }}
@@ -242,14 +244,14 @@ function LoadingScreen({ step }: { step: number }) {
             key={s}
             className="flex items-center gap-2.5 text-sm transition-all duration-500"
             style={{
-              color: i < step ? "#059669" : i === step ? "#ffffff" : "#6B7280",
+              color: i < step ? "#2563EB" : i === step ? "#ffffff" : "#6B7280",
               opacity: i > step + 1 ? 0.3 : 1,
             }}
           >
             <div
               className="w-1.5 h-1.5 rounded-full shrink-0 transition-all duration-500"
               style={{
-                background: i < step ? "#059669" : i === step ? "#ffffff" : "#6B7280",
+                background: i < step ? "#2563EB" : i === step ? "#ffffff" : "#6B7280",
               }}
             />
             {s}
@@ -262,6 +264,8 @@ function LoadingScreen({ step }: { step: number }) {
 
 // ─── Empty / Input State ──────────────────────────────────────────────────────
 
+const MAX_CHARS = 200
+
 function EmptyState({
   idea,
   onIdeaChange,
@@ -273,6 +277,7 @@ function EmptyState({
 }) {
   const [activeTab, setActiveTab] = useState<(typeof QUICK_TABS)[number]>("Validate Idea")
   const textareaRef = useRef<HTMLTextAreaElement>(null)
+  const remaining = MAX_CHARS - idea.length
 
   useEffect(() => {
     textareaRef.current?.focus()
@@ -300,7 +305,7 @@ function EmptyState({
       {/* Tab pills */}
       <div
         className="flex items-center gap-1 p-1 rounded-lg mb-6 border"
-        style={{ background: "#0A1A10", borderColor: "#122B1A" }}
+        style={{ background: "#111827", borderColor: "#1E2D4A" }}
       >
         {QUICK_TABS.map((tab) => (
           <button
@@ -308,7 +313,7 @@ function EmptyState({
             onClick={() => setActiveTab(tab)}
             className="px-4 py-1.5 rounded-md text-sm font-medium transition-all"
             style={{
-              background: activeTab === tab ? "#059669" : "transparent",
+              background: activeTab === tab ? "#2563EB" : "transparent",
               color: activeTab === tab ? "#ffffff" : "#6B7280",
             }}
           >
@@ -320,12 +325,12 @@ function EmptyState({
       {/* Input box */}
       <div
         className="w-full rounded-xl border overflow-hidden mb-4"
-        style={{ background: "#0A1A10", borderColor: "#122B1A" }}
+        style={{ background: "#111827", borderColor: "#1E2D4A" }}
       >
         <textarea
           ref={textareaRef}
           value={idea}
-          onChange={(e) => onIdeaChange(e.target.value)}
+          onChange={(e) => onIdeaChange(e.target.value.slice(0, MAX_CHARS))}
           onKeyDown={handleKeyDown}
           placeholder='Describe your startup idea… (e.g. "A Notion-style tool for solo devs to track their SaaS metrics")'
           rows={5}
@@ -333,7 +338,7 @@ function EmptyState({
         />
 
         {/* Toolbar */}
-        <div className="flex items-center justify-between px-4 py-3 border-t" style={{ borderColor: "#122B1A" }}>
+        <div className="flex items-center justify-between px-4 py-3 border-t" style={{ borderColor: "#1E2D4A" }}>
           <div className="flex items-center gap-1">
             {[
               { icon: Paperclip, label: "Attach" },
@@ -359,18 +364,28 @@ function EmptyState({
             ))}
           </div>
 
-          {/* Submit */}
-          <button
-            onClick={onSubmit}
-            disabled={!idea.trim()}
-            className="w-9 h-9 rounded-full flex items-center justify-center transition-all disabled:opacity-30 disabled:cursor-not-allowed hover:brightness-110 active:scale-95"
-            style={{
-              background: idea.trim() ? "#059669" : "rgba(5,150,105,0.08)",
-              boxShadow: idea.trim() ? "0 0 18px rgba(52,211,153,0.35)" : "none",
-            }}
-          >
-            <ArrowUp size={16} className="text-white" />
-          </button>
+          <div className="flex items-center gap-3">
+            <span
+              className="text-xs tabular-nums"
+              style={{ color: remaining < 20 ? "#EF4444" : "#6B7280" }}
+            >
+              {idea.length}/{MAX_CHARS}
+            </span>
+            {/* Submit */}
+            <button
+              onClick={onSubmit}
+              disabled={!idea.trim()}
+              className="w-9 h-9 rounded-full flex items-center justify-center transition-all disabled:opacity-30 disabled:cursor-not-allowed active:scale-95"
+              style={{
+                background: idea.trim() ? "#2563EB" : "rgba(37,99,235,0.08)",
+                boxShadow: idea.trim() ? "0 0 18px rgba(37,99,235,0.45)" : "none",
+              }}
+              onMouseEnter={(e) => { if (idea.trim()) e.currentTarget.style.background = "#3B82F6" }}
+              onMouseLeave={(e) => { if (idea.trim()) e.currentTarget.style.background = "#2563EB" }}
+            >
+              <ArrowUp size={16} className="text-white" />
+            </button>
+          </div>
         </div>
       </div>
 
@@ -380,7 +395,7 @@ function EmptyState({
           className="px-1.5 py-0.5 rounded text-xs border"
           style={{
             background: "rgba(255,255,255,0.05)",
-            borderColor: "#122B1A",
+            borderColor: "#1E2D4A",
             color: "#6B7280",
           }}
         >
@@ -395,21 +410,21 @@ function EmptyState({
           <div
             key={title}
             className="rounded-xl border p-4 cursor-pointer transition-all"
-            style={{ background: "#0A1A10", borderColor: "#122B1A" }}
+            style={{ background: "#111827", borderColor: "#1E2D4A" }}
             onMouseEnter={(e) => {
-              e.currentTarget.style.borderColor = "rgba(5,150,105,0.35)"
+              e.currentTarget.style.borderColor = "rgba(37,99,235,0.35)"
               e.currentTarget.style.background = "rgba(255,255,255,0.04)"
             }}
             onMouseLeave={(e) => {
               e.currentTarget.style.borderColor = "rgba(255,255,255,0.07)"
-              e.currentTarget.style.background = "#0A1A10"
+              e.currentTarget.style.background = "#111827"
             }}
           >
             <div
               className="w-8 h-8 rounded-lg flex items-center justify-center mb-3"
-              style={{ background: "rgba(5,150,105,0.12)" }}
+              style={{ background: "rgba(37,99,235,0.12)" }}
             >
-              <Icon size={15} style={{ color: "#059669" }} />
+              <Icon size={15} style={{ color: "#2563EB" }} />
             </div>
             <p className="text-sm font-medium text-white mb-1">{title}</p>
             <p className="text-xs leading-relaxed" style={{ color: "#6B7280" }}>
@@ -429,13 +444,13 @@ function ReportPlaceholder({ idea }: { idea: string }) {
     <div className="flex-1 flex flex-col items-center justify-center px-6 py-12 max-w-3xl mx-auto w-full">
       <div
         className="w-full rounded-xl border p-8 text-center"
-        style={{ background: "#0A1A10", borderColor: "#122B1A" }}
+        style={{ background: "#111827", borderColor: "#1E2D4A" }}
       >
         <div
           className="w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-4"
-          style={{ background: "rgba(5,150,105,0.12)" }}
+          style={{ background: "rgba(37,99,235,0.12)" }}
         >
-          <Lightbulb size={20} style={{ color: "#059669" }} />
+          <Lightbulb size={20} style={{ color: "#2563EB" }} />
         </div>
         <h2 className="text-lg font-semibold text-white mb-2">Report Ready</h2>
         <p className="text-sm mb-1" style={{ color: "#6B7280" }}>
@@ -474,13 +489,13 @@ export default function WorkspacePage() {
   useEffect(() => {
     if (appState !== "loading") return
     setLoadingStep(0)
-    const timings = [900, 1800, 2700]
+    const timings = [900, 1800, 2700, 3600, 4500]
     const timeouts = timings.map((ms, i) =>
       setTimeout(() => setLoadingStep(i + 1), ms)
     )
     const done = setTimeout(() => {
       setAppState("report")
-    }, 3800)
+    }, 5600)
     return () => {
       timeouts.forEach(clearTimeout)
       clearTimeout(done)
@@ -513,7 +528,7 @@ export default function WorkspacePage() {
         {isDemoMode && (
           <div
             className="flex items-center justify-center gap-2 px-4 py-2 text-xs font-medium text-white"
-            style={{ background: "#059669" }}
+            style={{ background: "#2563EB" }}
           >
             <Zap size={12} />
             You&apos;re in demo mode — results are pre-loaded for speed
