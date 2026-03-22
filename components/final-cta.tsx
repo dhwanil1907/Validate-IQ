@@ -25,14 +25,6 @@ export function FinalCTA() {
         transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
         className="relative z-10 mx-auto max-w-3xl text-center"
       >
-        <h2 className="text-3xl font-semibold tracking-tight text-white sm:text-4xl lg:text-5xl">
-          Your next idea deserves a real answer.
-        </h2>
-        <p className="mx-auto mt-4 max-w-2xl text-base leading-relaxed text-[#6B7280] sm:text-lg">
-          Not a Reddit thread. Not a Google rabbit hole. A structured, data-backed validation — in the time it takes to
-          make coffee.
-        </p>
-
         <motion.div
           className="mx-auto mt-10 max-w-xl"
           initial={{ opacity: 0, y: 12 }}

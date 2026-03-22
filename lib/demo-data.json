@@ -1,0 +1,118 @@
+{
+  "snapshot": {
+    "oneLiner": "An AI-powered platform that gives founders a structured, data-backed market validation report in 60 seconds — before they write a single line of code.",
+    "problem": "Most founders spend 3–12 months building products that fail due to lack of market demand, ignoring existing competition, or misreading timing. Traditional market research takes weeks and costs thousands. Founders need a fast, affordable, and specific signal before they commit.",
+    "targetCustomer": "First-time and repeat founders at the idea or pre-MVP stage, indie hackers, startup studio operators, and accelerator cohort managers who need rapid, data-grounded go/no-go signals before investing time or money.",
+    "clarityScore": 9
+  },
+  "market": {
+    "tam": "$80B",
+    "tamSource": "IBISWorld Market Research Industry Report 2024",
+    "sam": "$5B",
+    "som": "$100M",
+    "growthRate": "12% annually",
+    "marketTiming": "Early",
+    "marketTimingReason": "The market for AI-native research tools is in its first major wave. Founders are increasingly comfortable paying for AI SaaS, but no dominant player has captured the startup validation niche specifically. Enterprise market intelligence tools (Crayon, Klue, Gartner) are too expensive and slow for early-stage founders. The window to establish a brand in this category is open — but narrowing as larger players like Perplexity expand into structured research."
+  },
+  "competitors": {
+    "competitors": [
+      {
+        "name": "ChatGPT",
+        "website": "chat.openai.com",
+        "funding": "$11B+",
+        "pricing": "Free / $20 per month",
+        "lastActivity": "GPT-4o launch April 2024"
+      },
+      {
+        "name": "Perplexity",
+        "website": "perplexity.ai",
+        "funding": "$165M",
+        "pricing": "Free / $20 per month",
+        "lastActivity": "Series B January 2024"
+      },
+      {
+        "name": "Crunchbase",
+        "website": "crunchbase.com",
+        "funding": "$56M",
+        "pricing": "$49 per month",
+        "lastActivity": "AI features launch 2024"
+      },
+      {
+        "name": "Exploding Topics",
+        "website": "explodingtopics.com",
+        "funding": "Bootstrapped (acquired by Semrush)",
+        "pricing": "$39–$299 per month",
+        "lastActivity": "Semrush acquisition Q1 2024"
+      },
+      {
+        "name": "Ideaflow",
+        "website": "ideaflow.app",
+        "funding": "$3.2M seed",
+        "pricing": "Free beta",
+        "lastActivity": "Seed round closed November 2023"
+      }
+    ],
+    "gapStatement": "None of these tools offer a structured, personalized validation report with live web citations, founder-profile-specific scoring, competitor funding data, market sizing, and a go/no-go verdict — all in one 60-second workflow. ChatGPT and Perplexity require the founder to prompt-engineer their own research. Crunchbase covers funding data but not viability scoring. The gap is a purpose-built validation layer built specifically for the pre-building founder moment."
+  },
+  "entryScore": {
+    "entryScore": 54,
+    "barrierLevel": "Medium",
+    "barriers": [
+      "Trust and credibility: founders will question whether AI-generated validation is reliable enough to stake their time and money on — building trust requires citations, sourcing, and case studies.",
+      "Distribution: reaching founders at the exact moment they have an idea (before they start building) is a narrow, high-intent window that is hard to target with paid ads alone.",
+      "Data freshness: competitive intelligence and market sizing go stale quickly — maintaining live, accurate data requires ongoing API costs and model updates."
+    ],
+    "advantages": [
+      "Low build cost — the core product can be built by a solo technical founder in under 4 weeks using existing LLM APIs, keeping burn extremely low in the validation phase.",
+      "Viral distribution potential — a shareable PDF report gives every user a built-in marketing artifact they naturally share with co-founders, advisors, and investors."
+    ],
+    "fastestEntryPath": "Launch a free tier that generates one full report per month with no sign-up required. Target Hacker News 'Show HN', r/startups, and Indie Hackers with a live demo. Collect 200 emails in week one. Convert 10% to a $12/month paid plan by week four. Use those early reports as case studies and SEO content."
+  },
+  "verdict": {
+    "verdict": "CONDITIONAL GO",
+    "viabilityScore": 78,
+    "topReasons": [
+      "The market timing is early and favorable — founders are actively looking for AI-powered research tools and willing to pay, but no category winner has emerged yet.",
+      "The unit economics are strong — Perplexity API costs are low, CAC can be near-zero via community distribution, and a $12–$39/month SaaS price point gives healthy margins.",
+      "The product has a natural viral loop — every report shared with a co-founder, investor, or advisor is a free acquisition channel."
+    ],
+    "topRisks": [
+      "OpenAI or Perplexity could ship a 'startup validation' template or product mode that replicates the core workflow within their existing platforms, commoditizing the offering overnight.",
+      "Founder trust is hard to earn — if early reports contain factual errors or hallucinated competitor data, word spreads fast in the founder community and recovery is difficult.",
+      "The paying customer (a founder with a brand-new idea) is the hardest person to reach consistently — they exist for a brief window and are scattered across communities with no single acquisition channel."
+    ],
+    "nextAction": "Build a working demo this week with one real idea pre-loaded. Post to Hacker News 'Show HN' by Friday. Your only goal is 50 people running a real validation and 5 paying $12 before the end of the month. Do not raise money. Do not hire. Validate the willingness to pay first."
+  },
+  "devilsAdvocate": {
+    "failures": [
+      {
+        "name": "IdeaScale",
+        "what": "An AI-assisted idea management and market validation platform targeting enterprise innovation teams and startup programs.",
+        "why": "Pivoted too far upmarket into enterprise idea management, losing focus on the founder use case. The product became a collaboration tool rather than a validation tool, and the enterprise sales cycle killed momentum. Founder community adoption never materialized.",
+        "year": "2022"
+      },
+      {
+        "name": "Founder2be",
+        "what": "A platform that helped founders validate ideas, find co-founders, and assess market fit through community feedback and structured surveys.",
+        "why": "Relied on community-generated validation rather than live data, making the signal low-quality and subjective. Founders wanted data, not opinions. The platform stalled when network effects failed to kick in — not enough founders to give useful feedback to other founders.",
+        "year": "2021"
+      },
+      {
+        "name": "Gust",
+        "what": "A startup platform that offered investor readiness scoring, idea validation tools, and structured feedback reports for early-stage founders.",
+        "why": "Tried to serve too many stakeholders — founders, angels, and accelerators — and ended up optimizing for none. The validation component was buried inside a broader fundraising product. Founders didn't trust the scoring because the methodology was opaque and not backed by live market data.",
+        "year": "2023"
+      }
+    ],
+    "thePattern": "Every failed competitor either drifted upmarket into enterprise, relied on community opinions instead of live data, or tried to serve multiple stakeholders at once. The single-stakeholder, data-first, founder-specific approach has never been executed with modern LLMs and live web access — which is exactly the gap ValidateIQ occupies.",
+    "survivalRule": "Never let the product become a collaboration tool, a feedback platform, or an enterprise play. The moment you add 'team features' or 'investor dashboards', you have lost your founder-first positioning. Stay ruthlessly focused on the solo founder at the idea stage, and make every report so specific and data-backed that they would pay $12 just to avoid a $100k mistake."
+  },
+  "confidence": {
+    "snapshot": "High",
+    "market": "High",
+    "competitors": "High",
+    "entryScore": "Medium",
+    "verdict": "High",
+    "devilsAdvocate": "Medium"
+  }
+}

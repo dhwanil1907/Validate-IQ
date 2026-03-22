@@ -125,19 +125,16 @@ export function Hero() {
             >
               <Button
                 size="lg"
-                onClick={() => router.push("/workspace")}
+                onClick={() => {
+                  localStorage.removeItem("isDemoMode")
+                  localStorage.removeItem("demoIdea")
+                  router.push("/workspace")
+                }}
                 className="h-auto rounded-lg border-0 bg-[#059669] px-6 py-3 text-base font-medium text-white shadow-none transition-[box-shadow,background-color] duration-300 ease-out hover:bg-[#059669] hover:shadow-[0_0_24px_-4px_rgba(52,211,153,0.35)] focus-visible:ring-2 focus-visible:ring-[#059669] focus-visible:ring-offset-2 focus-visible:ring-offset-[#000000]"
               >
                 → Validate My Idea
               </Button>
-              <Button
-                variant="ghost"
-                size="lg"
-                className="h-auto rounded-lg border border-transparent px-6 py-3 text-base font-medium text-[#6B7280] transition-[color,box-shadow,border-color] duration-[280ms] ease-out hover:border-[#122B1A] hover:bg-transparent hover:text-[#6B7280] focus-visible:border-[#059669]"
-              >
-                Watch 60-sec demo ▶
-              </Button>
-              <Button
+<Button
                 variant="ghost"
                 size="lg"
                 onClick={handleTryDemo}

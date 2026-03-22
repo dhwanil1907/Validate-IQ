@@ -47,10 +47,6 @@ export function LogoMarquee() {
         transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
         className="mx-auto max-w-5xl px-4 sm:px-6"
       >
-        <p className="mb-10 text-center text-xs font-medium uppercase tracking-widest text-[#6B7280]">
-          Trusted by builders at
-        </p>
-
         <ul className="mb-14 flex flex-wrap items-center justify-center gap-x-10 gap-y-6 sm:gap-x-12">
           {logos.map((name) => (
             <li key={name}>
