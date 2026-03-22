@@ -378,7 +378,35 @@ function Chatbot({
 }) {
   const [messages, setMessages] = useState<ChatMessage[]>([])
   const [loading, setLoading] = useState(false)
+  const [chatHeight, setChatHeight] = useState(200)
   const scrollRef = useRef<HTMLDivElement>(null)
+  const dragRef = useRef<{ startY: number; startHeight: number } | null>(null)
+
+  function onDragStart(e: React.MouseEvent) {
+    e.preventDefault()
+    dragRef.current = { startY: e.clientY, startHeight: chatHeight }
+    document.body.style.cursor = "ns-resize"
+    document.body.style.userSelect = "none"
+
+    function onMouseMove(ev: MouseEvent) {
+      if (!dragRef.current) return
+      // dragging UP (smaller clientY) → bigger panel
+      const delta = dragRef.current.startY - ev.clientY
+      const next = Math.min(480, Math.max(80, dragRef.current.startHeight + delta))
+      setChatHeight(next)
+    }
+
+    function onMouseUp() {
+      dragRef.current = null
+      document.body.style.cursor = ""
+      document.body.style.userSelect = ""
+      document.removeEventListener("mousemove", onMouseMove)
+      document.removeEventListener("mouseup", onMouseUp)
+    }
+
+    document.addEventListener("mousemove", onMouseMove)
+    document.addEventListener("mouseup", onMouseUp)
+  }
 
   const SUGGESTIONS = [
     "Why this score?",
@@ -422,98 +450,111 @@ function Chatbot({
   }
 
   return (
-    <div className="border-t flex flex-col gap-2 p-3" style={{ borderColor: "#122B1A" }}>
-      <p className="text-[9px] uppercase tracking-widest font-semibold" style={{ color: "#6B7280" }}>
-        Ask ValidateIQ
-      </p>
-
-      {/* Suggestion pills */}
-      <div className="flex flex-wrap gap-1">
-        {SUGGESTIONS.map((s) => (
-          <button
-            key={s}
-            onClick={() => sendMessage(s)}
-            className="px-2 py-0.5 rounded-full border transition-colors hover:bg-[#0A1A10]"
-            style={{ fontSize: "11px", borderColor: "#122B1A", color: "#34D399" }}
-          >
-            {s}
-          </button>
-        ))}
+    <div className="border-t flex flex-col gap-2" style={{ borderColor: "#122B1A" }}>
+      {/* Drag handle */}
+      <div
+        onMouseDown={onDragStart}
+        className="flex flex-col items-center justify-center gap-1 py-2 cursor-ns-resize select-none hover:bg-[#0A1A10] transition-colors"
+        style={{ borderBottom: "1px solid #1E3A28" }}
+        title="Drag to resize"
+      >
+        <div className="w-8 h-[3px] rounded-full" style={{ background: "#3D6A4E" }} />
+        <div className="w-8 h-[3px] rounded-full" style={{ background: "#3D6A4E" }} />
       </div>
 
-      {/* Message area */}
-      <div
-        ref={scrollRef}
-        className="flex flex-col gap-1.5 overflow-y-auto"
-        style={{ maxHeight: 200 }}
-      >
-        {messages.map((m, i) => (
-          <div key={i} className={`flex gap-1.5 ${m.role === "user" ? "justify-end" : "justify-start"}`}>
-            {m.role === "bot" && (
+      <div className="flex flex-col gap-2 px-3 pb-3">
+        <p className="text-[9px] uppercase tracking-widest font-semibold" style={{ color: "#6B7280" }}>
+          Ask ValidateIQ
+        </p>
+
+        {/* Suggestion pills */}
+        <div className="flex flex-wrap gap-1">
+          {SUGGESTIONS.map((s) => (
+            <button
+              key={s}
+              onClick={() => sendMessage(s)}
+              className="px-2 py-0.5 rounded-full border transition-colors hover:bg-[#0A1A10]"
+              style={{ fontSize: "11px", borderColor: "#122B1A", color: "#34D399" }}
+            >
+              {s}
+            </button>
+          ))}
+        </div>
+
+        {/* Message area */}
+        <div
+          ref={scrollRef}
+          className="flex flex-col gap-1.5 overflow-y-auto transition-all duration-300"
+          style={{ height: chatHeight, minHeight: 80 }}
+        >
+          {messages.map((m, i) => (
+            <div key={i} className={`flex gap-1.5 ${m.role === "user" ? "justify-end" : "justify-start"}`}>
+              {m.role === "bot" && (
+                <div
+                  className="w-4 h-4 rounded-full flex items-center justify-center text-[8px] font-bold text-white shrink-0 mt-0.5"
+                  style={{ background: "#059669" }}
+                >
+                  V
+                </div>
+              )}
               <div
-                className="w-4 h-4 rounded-full flex items-center justify-center text-[8px] font-bold text-white shrink-0 mt-0.5"
+                className="px-2 py-1.5 rounded-md border max-w-[85%]"
+                style={{
+                  fontSize: "12px",
+                  lineHeight: "1.6",
+                  background: m.role === "bot" ? "#0A1A10" : "#050F09",
+                  borderColor: "#122B1A",
+                  color: m.role === "bot" ? "#94A3B8" : "#CBD5E1",
+                }}
+              >
+                {m.role === "bot" ? renderMarkdown(m.content) : m.content}
+              </div>
+            </div>
+          ))}
+          {loading && (
+            <div className="flex gap-1.5">
+              <div
+                className="w-4 h-4 rounded-full flex items-center justify-center text-[8px] font-bold text-white shrink-0"
                 style={{ background: "#059669" }}
               >
                 V
               </div>
-            )}
-            <div
-              className="px-2 py-1.5 rounded-md border max-w-[85%]"
-              style={{
-                fontSize: "12px",
-                lineHeight: "1.6",
-                background: m.role === "bot" ? "#0A1A10" : "#050F09",
-                borderColor: "#122B1A",
-                color: m.role === "bot" ? "#94A3B8" : "#CBD5E1",
-              }}
-            >
-              {m.role === "bot" ? renderMarkdown(m.content) : m.content}
+              <div
+                className="px-2 py-1.5 rounded-md border"
+                style={{ fontSize: "12px", background: "#0A1A10", borderColor: "#122B1A", color: "#6B7280" }}
+              >
+                Thinking…
+              </div>
             </div>
-          </div>
-        ))}
-        {loading && (
-          <div className="flex gap-1.5">
-            <div
-              className="w-4 h-4 rounded-full flex items-center justify-center text-[8px] font-bold text-white shrink-0"
-              style={{ background: "#059669" }}
-            >
-              V
-            </div>
-            <div
-              className="px-2 py-1.5 rounded-md border"
-              style={{ fontSize: "12px", background: "#0A1A10", borderColor: "#122B1A", color: "#6B7280" }}
-            >
-              Thinking…
-            </div>
-          </div>
-        )}
-      </div>
+          )}
+        </div>
 
-      {/* Input row */}
-      <div className="flex gap-1.5 items-center">
-        <input
-          ref={inputRef}
-          value={inputValue}
-          onChange={(e) => onInputChange(e.target.value)}
-          onKeyDown={(e) => {
-            if (e.key === "Enter") sendMessage(inputValue)
-          }}
-          placeholder="Ask anything about your report…"
-          className="flex-1 px-2 py-1.5 rounded-md border outline-none"
-          style={{
-            fontSize: "13px",
-            background: "#0A1A10",
-            borderColor: "#122B1A",
-            color: "#94A3B8",
-          }}
-        />
-        <button
-          onClick={() => sendMessage(inputValue)}
-          className="w-[26px] h-[26px] rounded-md flex items-center justify-center shrink-0 transition-opacity hover:opacity-80"
-          style={{ background: "#059669" }}
-        >
-          <ArrowUp size={12} className="text-white" />
-        </button>
+        {/* Input row */}
+        <div className="flex gap-1.5 items-center">
+          <input
+            ref={inputRef}
+            value={inputValue}
+            onChange={(e) => onInputChange(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") sendMessage(inputValue)
+            }}
+            placeholder="Ask anything about your report…"
+            className="flex-1 px-2 py-1.5 rounded-md border outline-none"
+            style={{
+              fontSize: "13px",
+              background: "#0A1A10",
+              borderColor: "#122B1A",
+              color: "#94A3B8",
+            }}
+          />
+          <button
+            onClick={() => sendMessage(inputValue)}
+            className="w-[26px] h-[26px] rounded-md flex items-center justify-center shrink-0 transition-opacity hover:opacity-80"
+            style={{ background: "#059669" }}
+          >
+            <ArrowUp size={12} className="text-white" />
+          </button>
+        </div>
       </div>
     </div>
   )
