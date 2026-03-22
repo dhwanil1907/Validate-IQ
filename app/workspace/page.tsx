@@ -157,10 +157,10 @@ function Sidebar({
   return (
     <aside
       className="fixed top-0 left-0 h-screen w-[280px] flex flex-col border-r z-20"
-      style={{ background: "#050F09", borderColor: "#122B1A" }}
+      style={{ background: "#111318", borderColor: "#2A2D35" }}
     >
       {/* Logo */}
-      <div className="flex items-center gap-2.5 px-5 py-5 border-b" style={{ borderColor: "#122B1A" }}>
+      <div className="flex items-center gap-2.5 px-5 py-5 border-b" style={{ borderColor: "#2A2D35" }}>
         <LogoMark />
         <span className="font-semibold text-white text-base tracking-tight">Verdict</span>
       </div>
@@ -170,7 +170,7 @@ function Sidebar({
         <button
           onClick={onNewValidation}
           className="w-full flex items-center justify-center gap-2 py-2.5 rounded-lg font-medium text-white text-sm transition-all hover:brightness-110 active:scale-[0.98]"
-          style={{ background: "#059669" }}
+          style={{ background: "#10B981" }}
         >
           <Plus size={15} />
           New Validation
@@ -189,7 +189,7 @@ function Sidebar({
               onClick={onClick}
               className="flex items-center gap-2.5 px-3 py-2.5 rounded-lg text-sm text-left transition-colors w-full"
               style={{
-                background: active ? "rgba(5,150,105,0.12)" : "transparent",
+                background: active ? "rgba(16,185,129,0.12)" : "transparent",
                 color: active ? "#34D399" : "#6B7280",
               }}
               onMouseEnter={(e) => {
@@ -256,11 +256,11 @@ function Sidebar({
       </div>
 
       {/* User */}
-      <div className="px-4 py-4 border-t" style={{ borderColor: "#122B1A" }}>
+      <div className="px-4 py-4 border-t" style={{ borderColor: "#2A2D35" }}>
         <div className="flex items-center gap-3">
           <div
             className="w-8 h-8 rounded-full flex items-center justify-center font-semibold text-sm shrink-0"
-            style={{ background: "rgba(5,150,105,0.15)", color: "#34D399" }}
+            style={{ background: "rgba(16,185,129,0.15)", color: "#34D399" }}
           >
             F
           </div>
@@ -303,7 +303,7 @@ function TopBar({ isDemoMode, geography }: { isDemoMode: boolean; geography: str
   return (
     <div
       className="h-14 flex items-center justify-between px-6 border-b shrink-0"
-      style={{ borderColor: "#122B1A" }}
+      style={{ borderColor: "#2A2D35" }}
     >
       <div className="flex min-w-0 items-center gap-2">
         <span className="text-xs text-[#6B7280]">Verdict</span>
@@ -316,7 +316,7 @@ function TopBar({ isDemoMode, geography }: { isDemoMode: boolean; geography: str
             onClick={() => setShowConfig((v) => !v)}
             className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border text-xs font-medium transition-colors"
             style={{
-              borderColor: showConfig ? "#059669" : "#122B1A",
+              borderColor: showConfig ? "#10B981" : "#2A2D35",
               color: showConfig ? "#34D399" : "#6B7280",
               background: "transparent",
             }}
@@ -327,7 +327,7 @@ function TopBar({ isDemoMode, geography }: { isDemoMode: boolean; geography: str
           {showConfig && (
             <div
               className="absolute right-0 top-full mt-1 rounded-lg border z-30 py-3 px-3 flex flex-col gap-2.5"
-              style={{ background: "#0A1A10", borderColor: "#122B1A", width: 220 }}
+              style={{ background: "#1C1F26", borderColor: "#2A2D35", width: 220 }}
             >
               <p className="text-[9px] uppercase tracking-widest font-semibold" style={{ color: "#6B7280" }}>
                 Configuration
@@ -348,7 +348,7 @@ function TopBar({ isDemoMode, geography }: { isDemoMode: boolean; geography: str
         <button
           onClick={handleExport}
           className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border text-xs font-medium transition-colors hover:border-[rgba(255,255,255,0.12)]"
-          style={{ borderColor: "#122B1A", color: "#6B7280", background: "transparent" }}
+          style={{ borderColor: "#2A2D35", color: "#6B7280", background: "transparent" }}
         >
           <FileText size={13} />
           View Report
@@ -385,7 +385,7 @@ function LoadingScreen({
         <button
           onClick={onGoBack}
           className="px-5 py-2 rounded-lg text-sm font-medium text-white border transition-colors hover:border-[#34D399]"
-          style={{ borderColor: "#122B1A", background: "transparent" }}
+          style={{ borderColor: "#2A2D35", background: "transparent" }}
         >
           ← Go back
         </button>
@@ -399,7 +399,7 @@ function LoadingScreen({
       <div className="relative w-16 h-16">
         <div
           className="absolute inset-0 rounded-full border-2 border-transparent animate-spin"
-          style={{ borderTopColor: "#059669", borderRightColor: "rgba(5,150,105,0.3)" }}
+          style={{ borderTopColor: "#10B981", borderRightColor: "rgba(16,185,129,0.3)" }}
         />
         <div
           className="absolute inset-2 rounded-full border border-transparent animate-spin"
@@ -418,14 +418,14 @@ function LoadingScreen({
             key={s}
             className="flex items-center gap-2.5 text-sm transition-all duration-500"
             style={{
-              color: i < step ? "#059669" : i === step ? "#ffffff" : "#6B7280",
+              color: i < step ? "#10B981" : i === step ? "#ffffff" : "#6B7280",
               opacity: i > step + 1 ? 0.3 : 1,
             }}
           >
             <div
               className="w-1.5 h-1.5 rounded-full shrink-0 transition-all duration-500"
               style={{
-                background: i < step ? "#059669" : i === step ? "#ffffff" : "#6B7280",
+                background: i < step ? "#10B981" : i === step ? "#ffffff" : "#6B7280",
               }}
             />
             {s}
@@ -478,7 +478,7 @@ function EmptyState({
       {/* Input box */}
       <div
         className="w-full rounded-xl border overflow-hidden mb-4"
-        style={{ background: "#0A1A10", borderColor: "#122B1A" }}
+        style={{ background: "#1C1F26", borderColor: "#2A2D35" }}
       >
         <textarea
           ref={textareaRef}
@@ -491,7 +491,7 @@ function EmptyState({
         />
 
         {/* Toolbar */}
-        <div className="flex items-center justify-end px-4 py-3 border-t" style={{ borderColor: "#122B1A" }}>
+        <div className="flex items-center justify-end px-4 py-3 border-t" style={{ borderColor: "#2A2D35" }}>
           <div className="flex items-center gap-3">
             <span
               className="text-xs tabular-nums"
@@ -504,11 +504,11 @@ function EmptyState({
               disabled={!idea.trim()}
               className="w-9 h-9 rounded-full flex items-center justify-center transition-all disabled:opacity-30 disabled:cursor-not-allowed active:scale-95"
               style={{
-                background: idea.trim() ? "#059669" : "rgba(5,150,105,0.08)",
-                boxShadow: idea.trim() ? "0 0 18px rgba(5,150,105,0.45)" : "none",
+                background: idea.trim() ? "#10B981" : "rgba(16,185,129,0.08)",
+                boxShadow: idea.trim() ? "0 0 18px rgba(16,185,129,0.45)" : "none",
               }}
-              onMouseEnter={(e) => { if (idea.trim()) e.currentTarget.style.background = "#06b479" }}
-              onMouseLeave={(e) => { if (idea.trim()) e.currentTarget.style.background = "#059669" }}
+              onMouseEnter={(e) => { if (idea.trim()) e.currentTarget.style.background = "#059669" }}
+              onMouseLeave={(e) => { if (idea.trim()) e.currentTarget.style.background = "#10B981" }}
             >
               <ArrowUp size={16} className="text-white" />
             </button>
@@ -522,7 +522,7 @@ function EmptyState({
           className="px-1.5 py-0.5 rounded text-xs border"
           style={{
             background: "rgba(255,255,255,0.05)",
-            borderColor: "#122B1A",
+            borderColor: "#2A2D35",
             color: "#6B7280",
           }}
         >
@@ -589,8 +589,8 @@ function SurveyScreen({
                       padding: "8px 16px",
                       borderRadius: "99px",
                       fontSize: "13px",
-                      background: selected ? "#059669" : "#0A1A10",
-                      borderColor: selected ? "#059669" : "#122B1A",
+                      background: selected ? "#10B981" : "#1C1F26",
+                      borderColor: selected ? "#10B981" : "#2A2D35",
                       color: selected ? "#ffffff" : "#6B7280",
                     }}
                   >
@@ -608,7 +608,7 @@ function SurveyScreen({
         onClick={onSubmit}
         className="w-full text-white font-semibold transition-all hover:brightness-110 active:scale-[0.98]"
         style={{
-          background: "#059669",
+          background: "#10B981",
           fontSize: "15px",
           fontWeight: 600,
           padding: "14px 32px",
@@ -769,7 +769,7 @@ export default function WorkspacePage() {
         {isDemoMode && (
           <div
             className="flex items-center justify-center gap-2 px-4 py-2 text-xs font-medium text-white"
-            style={{ background: "#059669" }}
+            style={{ background: "#10B981" }}
           >
             <Zap size={12} />
             You&apos;re in demo mode — results are pre-loaded for speed

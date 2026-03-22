@@ -37,14 +37,14 @@
   --sidebar-accent-foreground: oklch(0.205 0 0);
   --sidebar-border: oklch(0.922 0 0);
   --sidebar-ring: oklch(0.708 0 0);
-  --emerald: #059669;
+  --emerald: #10B981;
   --emerald-hover: #34d399;
-  --emerald-tint: rgba(5, 150, 105, 0.12);
-  --emerald-dim: rgba(5, 150, 105, 0.08);
+  --emerald-tint: rgba(16, 185, 129, 0.12);
+  --emerald-dim: rgba(16, 185, 129, 0.08);
   --emerald-glow: rgba(52, 211, 153, 0.35);
-  --surface: #050f09;
-  --card-bg: #0a1a10;
-  --border-color: #122b1a;
+  --surface: #111318;
+  --card-bg: #1c1f26;
+  --border-color: #2a2d35;
 }
 
 .dark {
@@ -147,7 +147,7 @@
 /* Custom thin scrollbar */
 ::-webkit-scrollbar { width: 4px; }
 ::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: #1E2D4A; border-radius: 99px; }
+::-webkit-scrollbar-thumb { background: #2A2D35; border-radius: 99px; }
 
 /* Border beam animation for pricing */
 @keyframes border-beam {

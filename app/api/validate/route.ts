@@ -139,7 +139,7 @@ function parseSection(result: { data: PerplexityResponse | null; error: string |
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json()
-    const { idea, survey } = body as { idea: string; survey: Survey }
+    const { idea, survey, existingReport } = body as { idea: string; survey: Survey; existingReport?: any }
 
     if (!idea || typeof idea !== "string") {
       return NextResponse.json({ error: true, message: "Missing idea" }, { status: 400 })
@@ -156,11 +156,13 @@ export async function POST(req: NextRequest) {
     const [snap, mkt, comp, entry, verdict, devil] = await Promise.all([
 
       // CALL 1 — Idea Snapshot
-      callPerplexity([
-        { role: "system", content: systemPrompt() },
-        {
-          role: "user",
-          content: `For this startup idea: ${idea}
+      existingReport 
+        ? Promise.resolve({ data: null, error: null }) 
+        : callPerplexity([
+            { role: "system", content: systemPrompt() },
+            {
+              role: "user",
+              content: `For this startup idea: ${idea}
 Return this exact JSON:
 {
   "oneLiner": string,
@@ -168,15 +170,17 @@ Return this exact JSON:
   "targetCustomer": string,
   "clarityScore": number
 }`,
-        },
-      ]),
+            },
+          ]),
 
       // CALL 2 — Market Signals
-      callPerplexity([
-        { role: "system", content: systemPrompt() },
-        {
-          role: "user",
-          content: `For this startup idea: ${idea}
+      existingReport 
+        ? Promise.resolve({ data: null, error: null }) 
+        : callPerplexity([
+            { role: "system", content: systemPrompt() },
+            {
+              role: "user",
+              content: `For this startup idea: ${idea}
 Geography: ${geo}
 Return this exact JSON:
 {
@@ -188,15 +192,17 @@ Return this exact JSON:
   "marketTiming": "Early" | "Peak" | "Late",
   "marketTimingReason": string
 }`,
-        },
-      ]),
+            },
+          ]),
 
       // CALL 3 — Competitor Intel
-      callPerplexity([
-        { role: "system", content: systemPrompt() },
-        {
-          role: "user",
-          content: `For this startup idea: ${idea}
+      existingReport 
+        ? Promise.resolve({ data: null, error: null }) 
+        : callPerplexity([
+            { role: "system", content: systemPrompt() },
+            {
+              role: "user",
+              content: `For this startup idea: ${idea}
 Find 3-5 real active competitors.
 Return this exact JSON:
 {
@@ -211,8 +217,8 @@ Return this exact JSON:
   ],
   "gapStatement": string
 }`,
-        },
-      ]),
+            },
+          ]),
 
       // CALL 4 — Market Entry Score
       callPerplexity([
@@ -223,8 +229,7 @@ Return this exact JSON:
 ${founderCtx}
 Return this exact JSON:
 {
-  "entryScore": number (0-10),
-  "barrierLevel": "Low" | "Medium" | "High" | "Very High",
+  "entryScore": number (0-10, where 10 = easiest to enter),
   "barriers": [string, string, string],
   "advantages": [string, string],
   "fastestEntryPath": string
@@ -241,8 +246,7 @@ Return this exact JSON:
 ${founderCtx}
 Return this exact JSON:
 {
-  "verdict": "GO" | "CONDITIONAL GO" | "NO-GO",
-  "viabilityScore": number (0-9),
+  "viabilityScore": number (0-9, where 9 = most viable),
   "topReasons": [string, string, string],
   "topRisks": [string, string, string],
   "nextAction": string
@@ -251,11 +255,13 @@ Return this exact JSON:
       ]),
 
       // CALL 6 — Devil's Advocate
-      callPerplexity([
-        { role: "system", content: systemPrompt() },
-        {
-          role: "user",
-          content: `For this startup idea: ${idea}
+      existingReport 
+        ? Promise.resolve({ data: null, error: null }) 
+        : callPerplexity([
+            { role: "system", content: systemPrompt() },
+            {
+              role: "user",
+              content: `For this startup idea: ${idea}
 Find 3 real companies that tried this and failed.
 Return this exact JSON:
 {
@@ -270,8 +276,8 @@ Return this exact JSON:
   "thePattern": string,
   "survivalRule": string
 }`,
-        },
-      ]),
+            },
+          ]),
     ])
 
     // ── Parse each section ────────────────────────────────────────────────────
@@ -285,6 +291,30 @@ Return this exact JSON:
       devilsAdvocate: parseSection(devil),
     }
 
+    // ── Normalize numeric scores ──────────────────────────────────────────────
+
+    function normalizeEntryScore(raw: unknown): number {
+      const n = typeof raw === "string" ? parseFloat(raw) : Number(raw)
+      if (isNaN(n)) return 5
+      return Math.min(10, Math.max(0, Math.round(n * 10) / 10))
+    }
+
+    function normalizeViabilityScore(raw: unknown): number {
+      const n = typeof raw === "string" ? parseFloat(raw) : Number(raw)
+      if (isNaN(n)) return 5
+      return Math.min(9, Math.max(0, Math.round(n * 10) / 10))
+    }
+
+    const entryParsed = sections.entryScore.parsed as Record<string, unknown>
+    if (entryParsed && !entryParsed.error) {
+      entryParsed.entryScore = normalizeEntryScore(entryParsed.entryScore)
+    }
+
+    const verdictParsed = sections.verdict.parsed as Record<string, unknown>
+    if (verdictParsed && !verdictParsed.error) {
+      verdictParsed.viabilityScore = normalizeViabilityScore(verdictParsed.viabilityScore)
+    }
+
     function extractUrls(citations: PerplexityCitation[]): string[] {
       return citations
         .map((c) => (typeof c === "string" ? c : c.url))
@@ -292,27 +322,27 @@ Return this exact JSON:
     }
 
     return NextResponse.json({
-      snapshot:       sections.snapshot.parsed,
-      market:         sections.market.parsed,
-      competitors:    sections.competitors.parsed,
+      snapshot:       existingReport ? existingReport.snapshot : sections.snapshot.parsed,
+      market:         existingReport ? existingReport.market : sections.market.parsed,
+      competitors:    existingReport ? existingReport.competitors : sections.competitors.parsed,
       entryScore:     sections.entryScore.parsed,
       verdict:        sections.verdict.parsed,
-      devilsAdvocate: sections.devilsAdvocate.parsed,
+      devilsAdvocate: existingReport ? existingReport.devilsAdvocate : sections.devilsAdvocate.parsed,
       confidence: {
-        snapshot:       getConfidenceLevel(sections.snapshot.citations),
-        market:         getConfidenceLevel(sections.market.citations),
-        competitors:    getConfidenceLevel(sections.competitors.citations),
+        snapshot:       existingReport ? existingReport.confidence?.snapshot : getConfidenceLevel(sections.snapshot.citations),
+        market:         existingReport ? existingReport.confidence?.market : getConfidenceLevel(sections.market.citations),
+        competitors:    existingReport ? existingReport.confidence?.competitors : getConfidenceLevel(sections.competitors.citations),
         entryScore:     getConfidenceLevel(sections.entryScore.citations),
         verdict:        getConfidenceLevel(sections.verdict.citations),
-        devilsAdvocate: getConfidenceLevel(sections.devilsAdvocate.citations),
+        devilsAdvocate: existingReport ? existingReport.confidence?.devilsAdvocate : getConfidenceLevel(sections.devilsAdvocate.citations),
       },
       citations: {
-        snapshot:       extractUrls(sections.snapshot.citations),
-        market:         extractUrls(sections.market.citations),
-        competitors:    extractUrls(sections.competitors.citations),
+        snapshot:       existingReport ? existingReport.citations?.snapshot : extractUrls(sections.snapshot.citations),
+        market:         existingReport ? existingReport.citations?.market : extractUrls(sections.market.citations),
+        competitors:    existingReport ? existingReport.citations?.competitors : extractUrls(sections.competitors.citations),
         entryScore:     extractUrls(sections.entryScore.citations),
         verdict:        extractUrls(sections.verdict.citations),
-        devilsAdvocate: extractUrls(sections.devilsAdvocate.citations),
+        devilsAdvocate: existingReport ? existingReport.citations?.devilsAdvocate : extractUrls(sections.devilsAdvocate.citations),
       },
     })
   } catch (err) {

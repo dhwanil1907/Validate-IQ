@@ -31,7 +31,7 @@ export function FinalCTA() {
           animate={isInView ? { opacity: 1, y: 0 } : {}}
           transition={{ duration: 0.5, delay: 0.1, ease: [0.22, 1, 0.36, 1] }}
         >
-          <div className="cta-input-breathe flex flex-col gap-2 rounded-xl border border-[#122B1A] bg-[#0A1A10] p-1.5 shadow-[inset_0_1px_0_rgba(255,255,255,0.04)] focus-within:border-[#059669] focus-within:ring-2 focus-within:ring-[#059669]/25 sm:flex-row sm:items-stretch sm:gap-0 sm:p-1">
+          <div className="cta-input-breathe flex flex-col gap-2 rounded-xl border border-[#2A2D35] bg-[#1C1F26] p-1.5 shadow-[inset_0_1px_0_rgba(255,255,255,0.04)] focus-within:border-[#10B981] focus-within:ring-2 focus-within:ring-[#10B981]/25 sm:flex-row sm:items-stretch sm:gap-0 sm:p-1">
             <input
               type="text"
               placeholder="Describe your startup idea..."
@@ -52,7 +52,7 @@ export function FinalCTA() {
         </p>
       </motion.div>
 
-      <footer className="relative z-10 mt-20 border-t border-[#122B1A] px-4 py-8">
+      <footer className="relative z-10 mt-20 border-t border-[#2A2D35] px-4 py-8">
         <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-6 text-sm sm:flex-row sm:gap-4">
           <span className="font-semibold text-white">Verdict</span>
           <nav className="flex flex-wrap items-center justify-center gap-6">

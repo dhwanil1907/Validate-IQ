@@ -89,7 +89,7 @@ export function Pricing() {
           </p>
 
           <div className="mt-8 flex flex-col items-center gap-3 sm:flex-row sm:justify-center sm:gap-4">
-            <div className="inline-flex items-center rounded-full border border-[#122B1A] bg-[#0A1A10] p-1">
+            <div className="inline-flex items-center rounded-full border border-[#2A2D35] bg-[#1C1F26] p-1">
               <button
                 type="button"
                 onClick={() => setBilling("monthly")}
@@ -101,7 +101,7 @@ export function Pricing() {
                 {billing === "monthly" && (
                   <motion.span
                     layoutId="pricing-billing-pill"
-                    className="absolute inset-0 rounded-full bg-[rgba(5,150,105,0.2)] ring-1 ring-[#059669]/40"
+                    className="absolute inset-0 rounded-full bg-[rgba(16,185,129,0.2)] ring-1 ring-[#10B981]/40"
                     transition={{ type: "spring", stiffness: 400, damping: 32 }}
                   />
                 )}
@@ -121,7 +121,7 @@ export function Pricing() {
                 {billing === "annual" && (
                   <motion.span
                     layoutId="pricing-billing-pill"
-                    className="absolute inset-0 rounded-full bg-[rgba(5,150,105,0.2)] ring-1 ring-[#059669]/40"
+                    className="absolute inset-0 rounded-full bg-[rgba(16,185,129,0.2)] ring-1 ring-[#10B981]/40"
                     transition={{ type: "spring", stiffness: 400, damping: 32 }}
                   />
                 )}
@@ -156,15 +156,15 @@ export function Pricing() {
                 animate={isInView ? { opacity: 1, y: 0 } : {}}
                 transition={{ duration: 0.45, delay: 0.08 * index, ease: [0.22, 1, 0.36, 1] }}
                 className={cn(
-                  "relative flex flex-col rounded-2xl border bg-[#0A1A10] p-6",
-                  "border-[#122B1A]",
+                  "relative flex flex-col rounded-2xl border bg-[#1C1F26] p-6",
+                  "border-[#2A2D35]",
                   isPopular &&
-                    "z-10 border-[#059669] shadow-[0_0_30px_rgba(5,150,105,0.2)] md:scale-[1.05]",
+                    "z-10 border-[#10B981] shadow-[0_0_30px_rgba(16,185,129,0.2)] md:scale-[1.05]",
                 )}
               >
                 {isPopular && (
                   <div className="absolute -top-0 left-1/2 z-20 -translate-x-1/2 -translate-y-1/2">
-                    <span className="whitespace-nowrap rounded-full border border-[#059669]/40 bg-[#059669] px-3 py-1 text-xs font-semibold text-white shadow-sm">
+                    <span className="whitespace-nowrap rounded-full border border-[#10B981]/40 bg-[#10B981] px-3 py-1 text-xs font-semibold text-white shadow-sm">
                       Most Popular
                     </span>
                   </div>
@@ -191,7 +191,7 @@ export function Pricing() {
                 <ul className="mb-8 flex-1 space-y-3">
                   {plan.features.map((feature) => (
                     <li key={feature} className="flex gap-2.5 text-sm text-[#FFFFFF]">
-                      <span className="shrink-0 font-medium text-[#059669]" aria-hidden>
+                      <span className="shrink-0 font-medium text-[#10B981]" aria-hidden>
                         ✓
                       </span>
                       <span>{feature}</span>
@@ -202,7 +202,7 @@ export function Pricing() {
                 {plan.ctaVariant === "indigo" ? (
                   <Button
                     onClick={() => router.push("/workspace")}
-                    className="h-11 w-full rounded-lg border-0 bg-[#059669] text-base font-medium text-white shadow-none transition-[box-shadow] duration-300 hover:bg-[#059669] hover:shadow-[0_0_24px_-4px_rgba(52,211,153,0.35)]"
+                    className="h-11 w-full rounded-lg border-0 bg-[#10B981] text-base font-medium text-white shadow-none transition-[box-shadow] duration-300 hover:bg-[#059669] hover:shadow-[0_0_24px_-4px_rgba(52,211,153,0.35)]"
                   >
                     {plan.cta}
                   </Button>
@@ -210,7 +210,7 @@ export function Pricing() {
                   <Button
                     variant="ghost"
                     onClick={() => router.push("/workspace")}
-                    className="h-11 w-full rounded-lg border border-[#122B1A] bg-transparent text-base font-medium text-[#6B7280] transition-colors hover:border-[#059669]/50 hover:bg-[rgba(5,150,105,0.06)] hover:text-[#FFFFFF]"
+                    className="h-11 w-full rounded-lg border border-[#2A2D35] bg-transparent text-base font-medium text-[#6B7280] transition-colors hover:border-[#10B981]/50 hover:bg-[rgba(16,185,129,0.06)] hover:text-[#FFFFFF]"
                   >
                     {plan.cta}
                   </Button>

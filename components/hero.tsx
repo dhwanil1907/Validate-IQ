@@ -48,7 +48,7 @@ export function Hero() {
             initial={{ opacity: 0, y: 14 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.4, delay: 0.12, ease: easeOut }}
-            className="mt-3 inline-flex items-center gap-1.5 rounded-full border border-[#1E2D4A] bg-[#0D1526] px-3 py-1"
+            className="mt-3 inline-flex items-center gap-1.5 rounded-full border border-[#2A2D35] bg-[#1C1F26] px-3 py-1"
           >
             <span style={{ fontSize: "10px", color: "#60A5FA" }}>⚡</span>
             <span style={{ fontSize: "11px", color: "#60A5FA" }}>Powered by Perplexity live search</span>
@@ -76,7 +76,7 @@ export function Hero() {
               variant="ghost"
               size="lg"
               onClick={handleTryDemo}
-              className="h-auto rounded-lg border border-[#1E2D4A] px-5 py-3 font-medium text-[#6B7280] transition-[color,border-color] duration-[280ms] ease-out hover:border-[#10B981] hover:bg-transparent hover:text-white"
+              className="h-auto rounded-lg border border-[#2A2D35] px-5 py-3 font-medium text-[#6B7280] transition-[color,border-color] duration-[280ms] ease-out hover:border-[#10B981] hover:bg-transparent hover:text-white"
               style={{ fontSize: "14px" }}
             >
               Try Demo →

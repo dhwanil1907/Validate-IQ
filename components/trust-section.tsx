@@ -11,13 +11,13 @@ const BADGES = [
 ]
 
 const badgeClass =
-  "rounded-full border border-[#122B1A] bg-[rgba(5,150,105,0.06)] px-4 py-2 text-sm text-[#FFFFFF] transition-[border-color,background-color] duration-200 ease-out hover:border-[#059669] hover:bg-[rgba(5,150,105,0.1)]"
+  "rounded-full border border-[#2A2D35] bg-[rgba(255,255,255,0.04)] px-4 py-2 text-sm text-[#FFFFFF] transition-[border-color,background-color] duration-200 ease-out hover:border-[#10B981] hover:bg-[rgba(255,255,255,0.06)]"
 
 /** Inline padlock SVG — shackle rotates shut, body gets a one-time “click” pulse (viewport once) */
 function LockSeal({ active }: { active: boolean }) {
   return (
     <div className="mb-8 flex justify-center" aria-hidden>
-      <div className="flex h-12 w-12 items-center justify-center rounded-full border border-[#122B1A] bg-[rgba(5,150,105,0.05)]">
+      <div className="flex h-12 w-12 items-center justify-center rounded-full border border-[#2A2D35] bg-[rgba(255,255,255,0.04)]">
         <svg width="28" height="28" viewBox="0 0 24 24" fill="none" className="overflow-visible text-[#059669]">
           <motion.g style={{ transformOrigin: "12px 11px" }} initial={{ rotate: -20 }} animate={active ? { rotate: 0 } : { rotate: -20 }} transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}>
             <path

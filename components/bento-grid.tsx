@@ -27,11 +27,11 @@ const itemVariants = {
 }
 
 const cardBase =
-  "group rounded-xl border border-[#122B1A] bg-[#0A1A10] p-6 transition-[transform,border-color] duration-200 ease-out hover:-translate-y-1 hover:border-[#059669]/60"
+  "group rounded-xl border border-[#2A2D35] bg-[#1C1F26] p-6 transition-[transform,border-color] duration-200 ease-out hover:-translate-y-1 hover:border-[#10B981]/60"
 
 function IconBox({ children }: { children: ReactNode }) {
   return (
-    <div className="mb-4 flex h-10 w-10 items-center justify-center rounded-lg border border-[#122B1A] bg-[#000000] text-[#6B7280] [&_svg]:h-5 [&_svg]:w-5">
+    <div className="mb-4 flex h-10 w-10 items-center justify-center rounded-lg border border-[#2A2D35] bg-[#000000] text-[#6B7280] [&_svg]:h-5 [&_svg]:w-5">
       {children}
     </div>
   )
@@ -70,7 +70,7 @@ function CompetitorRadarMock() {
       {rows.map((row) => (
         <div
           key={row.name}
-          className="flex items-center justify-between gap-2 rounded-lg border border-[#122B1A] bg-[#000000] px-2.5 py-2 sm:px-3"
+          className="flex items-center justify-between gap-2 rounded-lg border border-[#2A2D35] bg-[#000000] px-2.5 py-2 sm:px-3"
         >
           <span className="truncate text-xs font-medium text-[#FFFFFF]">{row.name}</span>
           <ThreatBadge level={row.level} />
@@ -115,7 +115,7 @@ function GapScoreMock() {
     <div className="mt-6 flex items-center justify-center">
       <div className="relative flex h-28 w-28 items-center justify-center">
         <svg className="h-full w-full -rotate-90" viewBox="0 0 88 88">
-          <circle cx="44" cy="44" fill="none" r={r} stroke="#122B1A" strokeWidth="8" />
+          <circle cx="44" cy="44" fill="none" r={r} stroke="#2A2D35" strokeWidth="8" />
           <circle
             cx="44"
             cy="44"
@@ -185,8 +185,8 @@ function TrendPulseMock() {
 
 function ExportMock() {
   return (
-    <div className="mt-6 rounded-lg border border-[#122B1A] bg-[#000000] p-4">
-      <div className="mb-3 flex items-center gap-2 border-b border-[#122B1A] pb-2">
+    <div className="mt-6 rounded-lg border border-[#2A2D35] bg-[#000000] p-4">
+      <div className="mb-3 flex items-center gap-2 border-b border-[#2A2D35] pb-2">
         <FileText className="h-4 w-4 text-[#059669]" strokeWidth={1.5} />
         <span className="text-xs font-medium text-[#FFFFFF]">Validation_Report.pdf</span>
       </div>
