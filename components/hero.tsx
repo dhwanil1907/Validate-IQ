@@ -1,6 +1,7 @@
 "use client"
 
 import { useEffect, useState } from "react"
+import { useRouter } from "next/navigation"
 import { motion } from "framer-motion"
 import { Button } from "@/components/ui/button"
 
@@ -63,8 +64,17 @@ function useTypingPlaceholder(strings: string[]) {
 
 const easeOut = [0.22, 1, 0.36, 1] as const
 
+const DEMO_IDEA = "An AI tool that helps founders validate their startup idea before building"
+
 export function Hero() {
   const typed = useTypingPlaceholder(TYPING_IDEAS)
+  const router = useRouter()
+
+  function handleTryDemo() {
+    localStorage.setItem("isDemoMode", "true")
+    localStorage.setItem("demoIdea", DEMO_IDEA)
+    router.push("/workspace")
+  }
 
   return (
     <section
@@ -125,6 +135,14 @@ export function Hero() {
                 className="h-auto rounded-lg border border-transparent px-6 py-3 text-base font-medium text-[#a1a1aa] transition-[color,box-shadow,border-color] duration-[280ms] ease-out hover:border-[#6366f1]/40 hover:bg-transparent hover:text-[#a1a1aa] focus-visible:border-[#6366f1]"
               >
                 Watch 60-sec demo ▶
+              </Button>
+              <Button
+                variant="ghost"
+                size="lg"
+                onClick={handleTryDemo}
+                className="h-auto rounded-lg border border-[#6366f1]/40 px-6 py-3 text-base font-medium text-[#a1a1aa] transition-[color,box-shadow,border-color] duration-[280ms] ease-out hover:border-[#6366f1]/70 hover:bg-transparent hover:text-white focus-visible:border-[#6366f1]"
+              >
+                Try Demo →
               </Button>
             </motion.div>
           </div>
